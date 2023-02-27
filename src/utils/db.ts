@@ -1,6 +1,8 @@
 import { connect, set } from "mongoose";
 
+import { env } from "@/utils/env";
+
 set("strictQuery", false);
 export const connectDatabase = async () => {
-  return connect("mongodb://127.0.0.1/club-portal");
+  return connect(env.MONGODB_URI);
 };

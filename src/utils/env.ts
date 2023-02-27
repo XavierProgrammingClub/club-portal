@@ -80,6 +80,7 @@ import { z } from "zod";
 
 const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]),
+  MONGODB_URI: z.string(),
   JWT_SECRET: z.string(),
 });
 

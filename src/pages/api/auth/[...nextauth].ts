@@ -10,8 +10,7 @@ import User from "@/models/user";
 import { connectDatabase } from "@/utils/db";
 import { env } from "@/utils/env";
 
-const userSchema = z.object({
-  name: z.string(),
+export const loginSchema = z.object({
   password: z.string(),
   email: z.string(),
 });
@@ -21,7 +20,6 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        name: { label: "Name", type: "text", placeholder: "John Smith" },
         email: {
           label: "Email",
           type: "email",
@@ -32,15 +30,16 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         connectDatabase().catch(() => {
           return {
-            error: "Database connection failed",
+            status: "ERROR",
+            message: "Internal Server Error",
           };
         });
 
-        credentials = userSchema.parse(credentials);
+        credentials = loginSchema.parse(credentials);
 
         const user = await User.findOne({ email: credentials.email });
         if (!user) {
-          throw new Error("No user Found with Email Please Sign Up...!");
+          throw new Error("User not found");
         }
 
         const isPasswordCorrect = await compare(
@@ -57,11 +56,15 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id;
-      }
-      return session;
+    session({ session, token }) {
+      return {
+        ...session,
+        user: {
+          name: session.user.name as string,
+          email: session.user.email as string,
+          id: token.sub as string,
+        },
+      };
     },
     async jwt({ token }) {
       return token;

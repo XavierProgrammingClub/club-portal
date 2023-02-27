@@ -1,16 +1,23 @@
-import NextAuth from "next-auth";
+// noinspection ES6UnusedImports,JSUnusedGlobalSymbols
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { ObjectId } from "mongoose";
+import NextAuth, { DefaultSession } from "next-auth";
+
+import { IUser } from "@/models/user";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
-    } & DefaultSession["user"];
+      name: string;
+      email: string;
+    };
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User extends IUser {
+    _id: ObjectId;
+    // ...other properties
+    // role: UserRole;
+  }
 }
