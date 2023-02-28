@@ -1,8 +1,6 @@
 import { compare } from "bcryptjs";
-import { sign, verify } from "jsonwebtoken";
 import { GetServerSidePropsContext } from "next";
 import NextAuth, { getServerSession, NextAuthOptions } from "next-auth";
-import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { z } from "zod";
 
@@ -57,14 +55,8 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     session({ session, token }) {
-      return {
-        ...session,
-        user: {
-          name: session.user.name as string,
-          email: session.user.email as string,
-          id: token.sub as string,
-        },
-      };
+      session.user.id = token.sub as string;
+      return session;
     },
     async jwt({ token }) {
       return token;
@@ -76,12 +68,6 @@ export const authOptions: NextAuthOptions = {
   },
   jwt: {
     maxAge: 60 * 60 * 24 * 30,
-    encode: async ({ secret, token }) => {
-      return sign(token as object, secret);
-    },
-    decode: async ({ secret, token }) => {
-      return verify(token as string, secret) as JWT;
-    },
   },
 };
 
@@ -92,4 +78,15 @@ export const getServerAuthSession = (ctx: {
   res: GetServerSidePropsContext["res"];
 }) => {
   return getServerSession(ctx.req, ctx.res, authOptions);
+};
+
+export const getCurrentUserDetails = async (ctx: {
+  req: GetServerSidePropsContext["req"];
+  res: GetServerSidePropsContext["res"];
+}) => {
+  const session = await getServerAuthSession(ctx);
+  if (!session) throw new Error("User not logged in!");
+
+  const user = await User.findById(session.user.id).select("-password");
+  return user;
 };

@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { FormEvent, useState } from "react";
 
+import { queryClient } from "@/pages/_app";
 import { getServerAuthSession } from "@/pages/api/auth/[...nextauth]";
 
 const SignIn = () => {
@@ -21,6 +22,7 @@ const SignIn = () => {
       callbackUrl: "/",
     });
 
+    await queryClient.refetchQueries(["current-user"]);
     if (data?.ok) return router.push("/");
     console.log(data);
   };

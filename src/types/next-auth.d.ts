@@ -14,10 +14,4 @@ declare module "next-auth" {
       email: string;
     };
   }
-
-  interface User extends IUser {
-    _id: ObjectId;
-    // ...other properties
-    // role: UserRole;
-  }
 }

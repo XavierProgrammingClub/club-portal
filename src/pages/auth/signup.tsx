@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { FormEvent, useState } from "react";
 
+import { queryClient } from "@/pages/_app";
 import { getServerAuthSession } from "@/pages/api/auth/[...nextauth]";
 
 const SignUp = () => {
@@ -17,7 +18,7 @@ const SignUp = () => {
     e.preventDefault();
 
     try {
-      await axios.post("/api/signup", {
+      await axios.post("/api/users", {
         name,
         email,
         password,
@@ -29,6 +30,7 @@ const SignUp = () => {
         callbackUrl: "/",
       });
 
+      await queryClient.refetchQueries(["current-user"]);
       if (data?.ok) return router.push("/");
     } catch (error) {
       console.log(error);

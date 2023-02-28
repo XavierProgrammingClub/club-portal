@@ -1,24 +1,37 @@
 import Link from "next/link";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
+
+import { useUser } from "@/hooks/useUser";
+import { queryClient } from "@/pages/_app";
 
 export const Navbar = () => {
-  const user = useSession();
+  const { data, isLoading, isError } = useUser();
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
+    await queryClient.refetchQueries(["current-user"]);
   };
 
   const renderAuthLinks = () => {
-    if (user.status === "unauthenticated")
+    if (!data?.user || isError)
       return (
         <>
-          <Link href="/auth/signin">Sign In </Link>
-          <Link href="/auth/signup">Sign Up </Link>
+          <Link href="/auth/signin">Sign In</Link>
+          <Link href="/auth/signup">Sign Up</Link>
         </>
       );
 
-    if (user.status === "authenticated")
-      return <button onClick={handleLogout}>Logout</button>;
+    const logoutButton = <button onClick={handleLogout}>Logout</button>;
+
+    if (data?.user.role === "superuser") {
+      return (
+        <>
+          <Link href="/admin">Admin</Link>
+          {logoutButton}
+        </>
+      );
+    }
+    return logoutButton;
   };
 
   return (

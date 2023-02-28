@@ -1,0 +1,22 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+nav {
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+aside {
+  width: 15%;
+  margin-top: 1rem;
+  float: left;
+  margin-right: 3rem;
+  background: #eee;
+}
+
+aside nav {
+  flex-direction: column;
+}
