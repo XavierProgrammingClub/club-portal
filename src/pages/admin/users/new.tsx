@@ -1,27 +1,32 @@
-import axios from "axios";
 import { useRouter } from "next/router";
-import { signIn } from "next-auth/react";
 import { FormEvent, useState } from "react";
 
 import { AdminNavbar } from "@/components/AdminNavbar";
-import { queryClient } from "@/pages/_app";
+import { useUser } from "@/hooks/useUser";
+import { axios } from "@/lib/axios";
+import { IUser } from "@/models/user";
 
 const AdminNewUser = () => {
+  const { data } = useUser();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const router = useRouter();
 
+  if (!data?.user || !(data?.user.role === "superuser")) return;
+
   const handleSignup = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
-      await axios.post("/api/users", {
+      const data = (await axios.post("/api/users", {
         name,
         email,
         password,
-      });
+      })) as { message: string; status: "OK" | "ERROR"; user: IUser };
+      await router.push(`/admin/users/${data.user._id}`);
     } catch (error) {
       console.log(error);
     }

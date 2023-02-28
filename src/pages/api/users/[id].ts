@@ -55,18 +55,8 @@ export default async function handler(
       @PUT /api/users/:id
       @desc Update a user details
     */
-    if (req.method === "PUT") {
-      const parsed = loginSchema.safeParse(req.body);
-      if (!parsed.success)
-        return res.status(422).json({
-          status: "ERROR",
-          message: "Validation Error Occurred",
-          error: parsed.error,
-        });
-
-      const { data } = parsed;
-
-      await User.updateOne({ _id: id }, data);
+    if (req.method === "PATCH") {
+      await User.updateOne({ _id: id }, req.body);
       return res.json({ status: "OK", message: "User updated successfully!" });
     }
   } catch (error) {

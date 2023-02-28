@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
 import { AdminNavbar } from "@/components/AdminNavbar";
 import { useUser } from "@/hooks/useUser";
@@ -31,8 +32,11 @@ const Index = () => {
       <ul>
         {data?.users.map((user) => (
           <li key={user._id}>
-            #{user._id} {user.email} {user.name}{" "}
-            <button onClick={() => handleDeleteUser(user._id)}>Delete</button>
+            <Link href={`/admin/users/${user._id}`}>
+              #{user._id} {user.email} {user.name}
+            </Link>
+            <button onClick={() => handleDeleteUser(user._id)}>Delete</button>{" "}
+            <Link href={`/admin/users/${user._id}/edit`}>Edit</Link>
           </li>
         ))}
       </ul>
