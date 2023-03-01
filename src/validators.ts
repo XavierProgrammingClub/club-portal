@@ -6,6 +6,7 @@ export const loginSchema = z.object({
 });
 
 export const signUpSchema = z.object({
+  profilePic: z.string().optional(),
   name: z.string(),
   password: z.string(),
   email: z.string(),

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
+import { CldImage } from "next-cloudinary";
 
 import { AdminNavbar } from "@/components/AdminNavbar";
 import { useUser } from "@/hooks/useUser";
@@ -29,6 +30,15 @@ const AdminSingleUser = () => {
   return (
     <>
       <AdminNavbar />
+
+      {data ? (
+        <CldImage
+          width="50"
+          height="50"
+          src={data.user.profilePic}
+          alt="Description of my image"
+        />
+      ) : null}
 
       <pre>{JSON.stringify(data?.user, null, 2)}</pre>
     </>

@@ -19,6 +19,7 @@ specifiers:
   mongoose: ^6.10.0
   next: 13.2.1
   next-auth: ^4.19.2
+  next-cloudinary: ^3.4.0
   prettier: ^2.8.4
   react: 18.2.0
   react-dom: 18.2.0
@@ -37,6 +38,7 @@ dependencies:
   mongoose: 6.10.0
   next: 13.2.1_biqbaboplfbrettd7655fr4n2y
   next-auth: 4.19.2_qgtcjgzkkjtbiyvnx7d32fl5vu
+  next-cloudinary: 3.4.0_next@13.2.1+react@18.2.0
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   typescript: 4.9.5
@@ -874,6 +876,29 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.11
+    dev: false
+
+  /@cloudinary-util/url-loader/2.0.0:
+    resolution: {integrity: sha512-yDFwNM6c6puIsXwhhwfFcOqIf1v6ML+vVFTAqczpW9qSWGE73s/z2aJJdGLYJvFbpL8VlFmpf3WL3xGYRArt6A==}
+    dependencies:
+      '@cloudinary-util/util': 2.0.0
+      '@cloudinary/url-gen': 1.9.1
+    dev: false
+
+  /@cloudinary-util/util/2.0.0:
+    resolution: {integrity: sha512-7WHFR7uIizW+MRLk+RhLVFQ6jzPKYrBZGICqy6s38hakj+zpXd4nISmMfKbZgwFTBp53oHRi8dW9G2kzXmVe3w==}
+    dev: false
+
+  /@cloudinary/transformation-builder-sdk/1.2.6:
+    resolution: {integrity: sha512-+ae+01Z+g5DprnjP502jqc9iInRHGUEXl0eUQfHjbLI+lJ76TTP5yNqgrnMocy///z1LS/qh4lrOC8DQdKwsNA==}
+    dependencies:
+      '@cloudinary/url-gen': 1.9.1
+    dev: false
+
+  /@cloudinary/url-gen/1.9.1:
+    resolution: {integrity: sha512-P1zgWug/dMieYoA/XxYQloPCLsvm2QWG5AZoMtMqwBFKPljSlLS7o4fFCO5coCt0nv3KKTiygRMSiwKSL/XuLA==}
+    dependencies:
+      '@cloudinary/transformation-builder-sdk': 1.2.6
     dev: false
 
   /@eslint/eslintrc/1.4.1:
@@ -2692,6 +2717,19 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       uuid: 8.3.2
+    dev: false
+
+  /next-cloudinary/3.4.0_next@13.2.1+react@18.2.0:
+    resolution: {integrity: sha512-iNb6azdQd5VIofo1ByQHh7e4pk3dx/8y9Z89NcvbRNRiGDGNWXwtl4TLGqFIuNdX3ShV0IWpb0teAIRFXQuAmA==}
+    peerDependencies:
+      next: ^12 || ^13
+      react: ^17 || ^18
+    dependencies:
+      '@cloudinary-util/url-loader': 2.0.0
+      '@cloudinary-util/util': 2.0.0
+      '@cloudinary/url-gen': 1.9.1
+      next: 13.2.1_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
     dev: false
 
   /next/13.2.1_biqbaboplfbrettd7655fr4n2y:

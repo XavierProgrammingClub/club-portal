@@ -1,10 +1,12 @@
 import { useRouter } from "next/router";
+import { CldUploadButton } from "next-cloudinary";
 import { FormEvent, useState } from "react";
 
 import { AdminNavbar } from "@/components/AdminNavbar";
 import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
 import { IUser } from "@/models/user";
+import { CloudinaryImage } from "@/types/cloudinary";
 
 const AdminNewUser = () => {
   const { data } = useUser();
@@ -12,6 +14,7 @@ const AdminNewUser = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [profilePic, setProfilePic] = useState<string>();
 
   const router = useRouter();
 
@@ -25,6 +28,7 @@ const AdminNewUser = () => {
         name,
         email,
         password,
+        profilePic,
       })) as { message: string; status: "OK" | "ERROR"; user: IUser };
       await router.push(`/admin/users/${data.user._id}`);
     } catch (error) {
@@ -32,11 +36,27 @@ const AdminNewUser = () => {
     }
   };
 
+  const handleOnUpload = (a: CloudinaryImage) => {
+    if (!(a.event === "success")) return;
+
+    setProfilePic(a.info.public_id);
+  };
+
   return (
     <>
       <AdminNavbar />
 
       <form onSubmit={handleSignup}>
+        <CldUploadButton
+          options={{
+            multiple: false,
+            resourceType: "image",
+            maxFileSize: 5242880,
+          }}
+          onUpload={handleOnUpload}
+          uploadPreset="fs1xhftk"
+        />
+
         <input
           type="name"
           placeholder="Name"
