@@ -9,7 +9,7 @@ export interface IClub {
   profilePic: string;
   members: [
     {
-      user: IUser;
+      user: string | IUser;
       role:
         | "President"
         | "Vice President"
@@ -29,23 +29,28 @@ export interface IClub {
   ];
 }
 
-const clubSchema = new mongoose.Schema<IClub>({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  profilePic: { type: String, required: true },
-  members: [
-    {
-      user: { ref: "User", required: true },
-      role: { type: "String" },
-    },
-  ],
-  isAvailableForRegistration: { type: Boolean, default: false },
-  announcements: {
-    title: { type: String, required: true },
+const clubSchema = new mongoose.Schema<IClub>(
+  {
+    name: { type: String, required: true },
     description: { type: String, required: true },
-    photo: { type: String },
+    profilePic: { type: String, required: true },
+    members: [
+      {
+        user: { ref: "User", required: true },
+        role: { type: "String" },
+      },
+    ],
+    isAvailableForRegistration: { type: Boolean, default: false },
+    announcements: {
+      title: { type: String, required: true },
+      description: { type: String, required: true },
+      photo: { type: String },
+    },
   },
-});
+  {
+    timestamps: true,
+  }
+);
 
 const Club = mongoose.models.Club || mongoose.model<IClub>("Club", clubSchema);
 export default Club;
