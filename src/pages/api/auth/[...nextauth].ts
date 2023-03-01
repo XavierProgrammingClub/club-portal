@@ -4,7 +4,7 @@ import NextAuth, { getServerSession, NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { z } from "zod";
 
-import User from "@/models/user";
+import User, { IUser } from "@/models/user";
 import { connectDatabase } from "@/utils/db";
 import { env } from "@/utils/env";
 
@@ -87,6 +87,8 @@ export const getCurrentUserDetails = async (ctx: {
   const session = await getServerAuthSession(ctx);
   if (!session) throw new Error("User not logged in!");
 
-  const user = await User.findById(session.user.id).select("-password");
+  const user = (await User.findById(session.user.id).select(
+    "-password"
+  )) as IUser;
   return user;
 };

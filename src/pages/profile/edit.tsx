@@ -1,52 +1,32 @@
-import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { CldImage, CldUploadButton } from "next-cloudinary";
 import { FormEvent, useState } from "react";
 
-import { AdminNavbar } from "@/components/AdminNavbar";
 import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
-import { IUser } from "@/models/user";
 import { queryClient } from "@/pages/_app";
 import { CloudinaryImage } from "@/types/cloudinary";
 
-const getUser = async (
-  id: string
-): Promise<{
-  status: "OK" | "ERROR";
-  user: IUser;
-}> => {
-  return axios.get(`/api/users/${id}`);
-};
-
-const AdminSingleUserEdit = () => {
-  const { data: userData } = useUser();
-
+const ProfileEdit = () => {
   const [name, setName] = useState("");
   const [profilePic, setProfilePic] = useState<string>();
 
+  const { data } = useUser({
+    onSuccess: (data) => {
+      setName(data.user.name);
+      setProfilePic(data.user.profilePic);
+    },
+  });
+
   const router = useRouter();
-  const { id } = router.query;
-
-  const { data, isLoading, isError } = useQuery(
-    ["user", id],
-    () => getUser(id as string),
-    {
-      onSuccess: (data) => {
-        setName(data.user.name);
-        setProfilePic(data.user.profilePic);
-      },
-    }
-  );
-
-  if (!userData?.user || !(userData?.user.role === "superuser")) return;
 
   const handleUpdateUser = async (e: FormEvent) => {
     e.preventDefault();
-    await axios.patch(`/api/users/${id}`, { name, profilePic });
+    await axios.patch(`/api/users/info`, { name, profilePic });
+    console.log("HEY");
 
-    await queryClient.refetchQueries(["all-users", "user", id]);
-    await router.push(`/admin/users/${id}`);
+    await queryClient.refetchQueries(["current-user"]);
+    await router.push(`/profile`);
   };
 
   const handleOnUpload = (a: CloudinaryImage) => {
@@ -57,8 +37,6 @@ const AdminSingleUserEdit = () => {
 
   return (
     <>
-      <AdminNavbar />
-
       {profilePic ? (
         <CldImage
           width="50"
@@ -92,4 +70,4 @@ const AdminSingleUserEdit = () => {
   );
 };
 
-export default AdminSingleUserEdit;
+export default ProfileEdit;

@@ -19,17 +19,22 @@ export const Navbar = () => {
         </>
       );
 
-    const logoutButton = <button onClick={handleLogout}>Logout</button>;
+    const linksForAuthenticatedUsers = (
+      <>
+        <Link href="/profile">Profile</Link>
+        <button onClick={handleLogout}>Logout</button>
+      </>
+    );
 
     if (data?.user.role === "superuser") {
       return (
         <>
           <Link href="/admin">Admin</Link>
-          {logoutButton}
+          {linksForAuthenticatedUsers}
         </>
       );
     }
-    return logoutButton;
+    return linksForAuthenticatedUsers;
   };
 
   return (

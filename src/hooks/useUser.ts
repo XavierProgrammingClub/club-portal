@@ -7,6 +7,12 @@ const getUser = async (): Promise<{ status: "OK" | "ERROR"; user: IUser }> => {
   return axios.get("/api/users/info");
 };
 
-export const useUser = () => {
-  return useQuery(["current-user"], getUser);
+interface IUseUserOptions {
+  onSuccess?: (data: { status: "OK" | "ERROR"; user: IUser }) => void;
+}
+
+export const useUser = (context?: IUseUserOptions) => {
+  return useQuery(["current-user"], getUser, {
+    onSuccess: context?.onSuccess,
+  });
 };

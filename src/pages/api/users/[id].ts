@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import User from "@/models/user";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 import { connectDatabase } from "@/utils/db";
-import { loginSchema } from "@/validators";
 
 export default async function handler(
   req: NextApiRequest,
@@ -41,7 +40,7 @@ export default async function handler(
       @desc Delete a user
     */
     if (req.method === "DELETE") {
-      if (user._id.toHexString() === id) {
+      if ((user._id as any).toHexString() === id) {
         return res
           .status(400)
           .json({ status: "ERROR", message: "You can't delete yourself" });
