@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { CldUploadButton } from "next-cloudinary";
+import { CldImage, CldUploadButton } from "next-cloudinary";
 import { FormEvent, useState } from "react";
 
 import { AdminNavbar } from "@/components/AdminNavbar";
@@ -46,17 +46,25 @@ const AdminNewUser = () => {
     <>
       <AdminNavbar />
 
-      <form onSubmit={handleSignup}>
-        <CldUploadButton
-          options={{
-            multiple: false,
-            resourceType: "image",
-            maxFileSize: 5242880,
-          }}
-          onUpload={handleOnUpload}
-          uploadPreset="fs1xhftk"
+      {profilePic ? (
+        <CldImage
+          width="50"
+          height="50"
+          src={profilePic}
+          alt="Description of my image"
         />
+      ) : null}
+      <CldUploadButton
+        options={{
+          multiple: false,
+          resourceType: "image",
+          maxFileSize: 5242880,
+        }}
+        onUpload={handleOnUpload}
+        uploadPreset="fs1xhftk"
+      />
 
+      <form onSubmit={handleSignup}>
         <input
           type="name"
           placeholder="Name"

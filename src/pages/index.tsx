@@ -1,15 +1,9 @@
 import { Inter } from "next/font/google";
 import Head from "next/head";
-import { CldImage, CldUploadButton } from "next-cloudinary";
-
-import { CloudinaryImage } from "@/types/cloudinary";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const handleOnUpload = (a: CloudinaryImage) => {
-    console.log(JSON.stringify(a));
-  };
   return (
     <>
       <Head>
@@ -18,24 +12,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={inter.className}>
-        <CldUploadButton
-          options={{
-            multiple: false,
-            resourceType: "image",
-            maxFileSize: 5242880,
-          }}
-          onUpload={handleOnUpload}
-          uploadPreset="fs1xhftk"
-        />
-
-        <CldImage
-          width="600"
-          height="600"
-          src="users/r28y6kquvetyzvzpybxp"
-          alt="Description of my image"
-        />
-      </main>
+      <main className={inter.className}></main>
     </>
   );
 }
