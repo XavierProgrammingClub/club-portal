@@ -12,14 +12,14 @@ export default async function handler(
     res.json({ status: "ERROR", message: "Internal Server Error" })
   );
 
-  const user = await getCurrentUserDetails({ req, res });
-
-  if (!user)
-    return res
-      .status(404)
-      .json({ status: "ERROR", message: "User not found!" });
-
   try {
+    const user = await getCurrentUserDetails({ req, res });
+
+    if (!user)
+      return res
+        .status(404)
+        .json({ status: "ERROR", message: "User not found!" });
+
     /*
       @GET /api/users/info
       @desc Get current user information

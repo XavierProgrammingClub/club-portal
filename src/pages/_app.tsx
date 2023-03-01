@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
+import NextNProgress from "nextjs-progressbar";
 
 import { Navbar } from "@/components/Navbar";
 
@@ -23,6 +24,7 @@ export default function App({
       <QueryClientProvider client={queryClient}>
         <Navbar />
         <Component {...pageProps} />
+        <NextNProgress />
       </QueryClientProvider>
     </SessionProvider>
   );
