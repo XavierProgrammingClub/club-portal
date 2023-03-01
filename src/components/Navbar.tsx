@@ -3,7 +3,6 @@ import { signOut } from "next-auth/react";
 
 import { useUser } from "@/hooks/useUser";
 import { queryClient } from "@/pages/_app";
-
 export const Navbar = () => {
   const { data, isLoading, isError } = useUser();
 
