@@ -2,16 +2,11 @@ import { compare } from "bcryptjs";
 import { GetServerSidePropsContext } from "next";
 import NextAuth, { getServerSession, NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { z } from "zod";
 
 import User, { IUser } from "@/models/user";
 import { connectDatabase } from "@/utils/db";
 import { env } from "@/utils/env";
-
-export const loginSchema = z.object({
-  password: z.string(),
-  email: z.string(),
-});
+import { loginSchema } from "@/validators";
 
 export const authOptions: NextAuthOptions = {
   providers: [

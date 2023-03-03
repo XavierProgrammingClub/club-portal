@@ -1,47 +1,45 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
-import { FormEvent, useState } from "react";
+import { useForm } from "react-hook-form";
 
 import { queryClient } from "@/pages/_app";
 import { getServerAuthSession } from "@/pages/api/auth/[...nextauth]";
+import { LoginUserCredentialsDTO, loginUserSchema } from "@/validators";
 
 const SignIn = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginUserCredentialsDTO>({
+    resolver: zodResolver(loginUserSchema),
+    reValidateMode: "onBlur",
+    mode: "all",
+  });
 
   const router = useRouter();
 
-  const handleLogin = async (e: FormEvent) => {
-    e.preventDefault();
-
-    const data = await signIn("credentials", {
+  const handleLogin = async (data: LoginUserCredentialsDTO) => {
+    const response = await signIn("credentials", {
       redirect: false,
-      email,
-      password,
+      ...data,
       callbackUrl: "/",
     });
 
     await queryClient.refetchQueries(["current-user"]);
-    if (data?.ok) return router.push("/");
-    console.log(data);
+    if (response?.ok) return router.push("/");
+    console.log(response);
   };
 
+  console.log(errors);
+
   return (
-    <form onSubmit={handleLogin}>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button>Login</button>
+    <form onSubmit={handleSubmit(handleLogin)}>
+      <input type="email" placeholder="Email" {...register("email")} />
+      <input type="password" placeholder="Password" {...register("password")} />
+      <button disabled={isSubmitting}>Login</button>
     </form>
   );
 };

@@ -1,7 +1,8 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { CldImage, CldUploadButton } from "next-cloudinary";
-import { FormEvent, useState } from "react";
+import { useForm } from "react-hook-form";
 
 import { AdminNavbar } from "@/components/AdminNavbar";
 import { useUser } from "@/hooks/useUser";
@@ -9,7 +10,10 @@ import { axios } from "@/lib/axios";
 import { IUser } from "@/models/user";
 import { queryClient } from "@/pages/_app";
 import { CloudinaryImage } from "@/types/cloudinary";
-
+import {
+  AdminUpdateUserCredentialsDTO,
+  adminUpdateUserSchema,
+} from "@/validators";
 const getUser = async (
   id: string
 ): Promise<{
@@ -22,28 +26,32 @@ const getUser = async (
 const AdminSingleUserEdit = () => {
   const { data: userData } = useUser();
 
-  const [name, setName] = useState("");
-  const [profilePic, setProfilePic] = useState<string>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    getValues,
+    setValue,
+    reset,
+  } = useForm<AdminUpdateUserCredentialsDTO>({
+    resolver: zodResolver(adminUpdateUserSchema),
+    reValidateMode: "onBlur",
+    mode: "all",
+  });
 
   const router = useRouter();
   const { id } = router.query;
 
-  const { data, isLoading, isError } = useQuery(
-    ["user", id],
-    () => getUser(id as string),
-    {
-      onSuccess: (data) => {
-        setName(data.user.name);
-        setProfilePic(data.user.profilePic);
-      },
-    }
-  );
+  const { data } = useQuery(["user", id], () => getUser(id as string), {
+    onSuccess: (data) => {
+      reset(data.user);
+    },
+  });
 
   if (!userData?.user || !(userData?.user.role === "superuser")) return;
 
-  const handleUpdateUser = async (e: FormEvent) => {
-    e.preventDefault();
-    await axios.patch(`/api/users/${id}`, { name, profilePic });
+  const handleUpdateUser = async (data: AdminUpdateUserCredentialsDTO) => {
+    await axios.patch(`/api/users/${id}`, data);
 
     await queryClient.refetchQueries(["all-users", "user", id]);
     await router.push(`/admin/users/${id}`);
@@ -52,18 +60,21 @@ const AdminSingleUserEdit = () => {
   const handleOnUpload = (a: CloudinaryImage) => {
     if (!(a.event === "success")) return;
 
-    setProfilePic(a.info.public_id);
+    setValue("profilePic", a.info.public_id);
   };
+
+  const values = getValues();
+  console.log(errors);
 
   return (
     <>
       <AdminNavbar />
 
-      {profilePic ? (
+      {values.profilePic ? (
         <CldImage
           width="50"
           height="50"
-          src={profilePic}
+          src={values.profilePic}
           alt="Description of my image"
         />
       ) : null}
@@ -76,17 +87,12 @@ const AdminSingleUserEdit = () => {
         }}
         onUpload={handleOnUpload}
         uploadPreset="fs1xhftk"
-      />
+      ></CldUploadButton>
 
-      <form onSubmit={handleUpdateUser}>
-        <input
-          type="name"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+      <form onSubmit={handleSubmit(handleUpdateUser)}>
+        <input type="text" placeholder="Name" {...register("name")} />
 
-        <button>Update</button>
+        <button disabled={isSubmitting}>Update</button>
       </form>
     </>
   );

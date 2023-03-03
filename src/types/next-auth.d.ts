@@ -3,6 +3,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ObjectId } from "mongoose";
 import NextAuth, { DefaultSession } from "next-auth";
+import { CldUploadButton, CldUploadButtonProps } from "next-cloudinary";
 
 import { IUser } from "@/models/user";
 

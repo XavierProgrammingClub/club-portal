@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import User from "@/models/user";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 import { connectDatabase } from "@/utils/db";
-import { signUpSchema } from "@/validators";
+import { newUserSchema } from "@/validators";
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,7 +20,7 @@ export default async function handler(
      @desc Signup User
     */
     if (req.method === "POST") {
-      const parsed = signUpSchema.safeParse(req.body);
+      const parsed = newUserSchema.safeParse(req.body);
       if (!parsed.success)
         return res.status(422).json({
           status: "ERROR",

@@ -1,29 +1,38 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/router";
 import { CldImage, CldUploadButton } from "next-cloudinary";
-import { FormEvent, useState } from "react";
+import { useForm } from "react-hook-form";
 
 import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
 import { queryClient } from "@/pages/_app";
 import { CloudinaryImage } from "@/types/cloudinary";
+import { UpdateUserCredentialsDTO, updateUserSchema } from "@/validators";
 
 const ProfileEdit = () => {
-  const [name, setName] = useState("");
-  const [profilePic, setProfilePic] = useState<string>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    getValues,
+    setValue,
+    reset,
+  } = useForm<UpdateUserCredentialsDTO>({
+    resolver: zodResolver(updateUserSchema),
+    reValidateMode: "onBlur",
+    mode: "all",
+  });
 
   const { data } = useUser({
     onSuccess: (data) => {
-      setName(data.user.name);
-      setProfilePic(data.user.profilePic);
+      reset(data.user);
     },
   });
 
   const router = useRouter();
 
-  const handleUpdateUser = async (e: FormEvent) => {
-    e.preventDefault();
-    await axios.patch(`/api/users/info`, { name, profilePic });
-    console.log("HEY");
+  const handleUpdateUser = async (data: UpdateUserCredentialsDTO) => {
+    await axios.patch(`/api/users/info`, data);
 
     await queryClient.refetchQueries(["current-user"]);
     await router.push(`/profile`);
@@ -32,16 +41,19 @@ const ProfileEdit = () => {
   const handleOnUpload = (a: CloudinaryImage) => {
     if (!(a.event === "success")) return;
 
-    setProfilePic(a.info.public_id);
+    setValue("profilePic", a.info.public_id);
   };
+
+  const values = getValues();
+  console.log(errors);
 
   return (
     <>
-      {profilePic ? (
+      {values.profilePic ? (
         <CldImage
           width="50"
           height="50"
-          src={profilePic}
+          src={values.profilePic}
           alt="Description of my image"
         />
       ) : null}
@@ -56,15 +68,10 @@ const ProfileEdit = () => {
         uploadPreset="fs1xhftk"
       />
 
-      <form onSubmit={handleUpdateUser}>
-        <input
-          type="name"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+      <form onSubmit={handleSubmit(handleUpdateUser)}>
+        <input type="text" placeholder="Name" {...register("name")} />
 
-        <button>Update</button>
+        <button disabled={isSubmitting}>Update</button>
       </form>
     </>
   );

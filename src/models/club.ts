@@ -7,6 +7,7 @@ export interface IClub {
   name: string;
   description: string;
   profilePic: string;
+  banner?: string;
   members: [
     {
       user: string | IUser;
@@ -17,35 +18,55 @@ export interface IClub {
         | "Active Member"
         | "General Member"
         | string;
+      permissions: {
+        canAddMembers: boolean;
+        canPublishAnnouncements: boolean;
+        canRemoveMembers: boolean;
+        canPublishBlogs: boolean;
+        canManageClubSettings: boolean;
+        canManagePermissions: boolean;
+      };
     }
   ];
   isAvailableForRegistration: boolean;
-  announcements: [
-    {
-      title: string;
-      description: string;
-      photo?: string;
-    }
-  ];
+  announcements: IAnnouncement[];
 }
+
+interface IAnnouncement {
+  title: string;
+  description: string;
+  photo?: string;
+}
+
+const announcementSchema = new mongoose.Schema<IAnnouncement>({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  photo: { type: String },
+});
 
 const clubSchema = new mongoose.Schema<IClub>(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
     profilePic: { type: String, required: true },
+    banner: { type: String, required: false },
     members: [
       {
         user: { ref: "User", required: true },
-        role: { type: "String" },
+        role: { type: "String", required: true },
+        showcase: { type: Boolean, default: true },
+        permissions: {
+          canAddMembers: { type: Boolean, required: true },
+          canPublishAnnouncements: { type: Boolean, required: true },
+          canRemoveMembers: { type: Boolean, default: false },
+          canPublishBlogs: { type: Boolean, required: true },
+          canManageClubSettings: { type: Boolean, required: true },
+          canManagePermissions: { type: Boolean, required: true },
+        },
       },
     ],
     isAvailableForRegistration: { type: Boolean, default: false },
-    announcements: {
-      title: { type: String, required: true },
-      description: { type: String, required: true },
-      photo: { type: String },
-    },
+    announcements: { type: [announcementSchema], default: [] },
   },
   {
     timestamps: true,

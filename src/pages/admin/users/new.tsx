@@ -1,36 +1,42 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/router";
 import { CldImage, CldUploadButton } from "next-cloudinary";
-import { FormEvent, useState } from "react";
+import { useForm } from "react-hook-form";
 
 import { AdminNavbar } from "@/components/AdminNavbar";
 import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
 import { IUser } from "@/models/user";
 import { CloudinaryImage } from "@/types/cloudinary";
+import { NewUserCredentialsDTO, newUserSchema } from "@/validators";
 
 const AdminNewUser = () => {
   const { data } = useUser();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [profilePic, setProfilePic] = useState<string>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    getValues,
+    setValue,
+  } = useForm<NewUserCredentialsDTO>({
+    resolver: zodResolver(newUserSchema),
+    reValidateMode: "onBlur",
+    mode: "all",
+  });
 
   const router = useRouter();
 
   if (!data?.user || !(data?.user.role === "superuser")) return;
 
-  const handleSignup = async (e: FormEvent) => {
-    e.preventDefault();
-
+  const handleSignup = async (data: NewUserCredentialsDTO) => {
     try {
-      const data = (await axios.post("/api/users", {
-        name,
-        email,
-        password,
-        profilePic,
-      })) as { message: string; status: "OK" | "ERROR"; user: IUser };
-      await router.push(`/admin/users/${data.user._id}`);
+      const response = (await axios.post("/api/users", data)) as {
+        message: string;
+        status: "OK" | "ERROR";
+        user: IUser;
+      };
+      await router.push(`/admin/users/${response.user._id}`);
     } catch (error) {
       console.log(error);
     }
@@ -39,21 +45,25 @@ const AdminNewUser = () => {
   const handleOnUpload = (a: CloudinaryImage) => {
     if (!(a.event === "success")) return;
 
-    setProfilePic(a.info.public_id);
+    setValue("profilePic", a.info.public_id);
   };
+
+  const values = getValues();
+  console.log(errors);
 
   return (
     <>
       <AdminNavbar />
 
-      {profilePic ? (
+      {values.profilePic ? (
         <CldImage
           width="50"
           height="50"
-          src={profilePic}
+          src={values.profilePic}
           alt="Description of my image"
         />
       ) : null}
+
       <CldUploadButton
         options={{
           multiple: false,
@@ -64,26 +74,16 @@ const AdminNewUser = () => {
         uploadPreset="fs1xhftk"
       />
 
-      <form onSubmit={handleSignup}>
-        <input
-          type="name"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      <form onSubmit={handleSubmit(handleSignup)}>
+        <input type="text" placeholder="Name" {...register("name")} />
+        <input type="email" placeholder="Email" {...register("email")} />
         <input
           type="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          {...register("password")}
         />
-        <button>Sign Up</button>
+
+        <button disabled={isSubmitting}>Sign Up</button>
       </form>
     </>
   );
