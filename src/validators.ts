@@ -24,35 +24,44 @@ export const newClubSchema = z.object({
   description: z.string(),
   profilePic: z.string(),
   banner: z.string().optional(),
-  members: z.array(
-    z.object({
-      user: z.string(),
-      role: z.string(),
-      showcase: z.boolean(),
-      permissions: z.object({
-        canAddMembers: z.boolean(),
-        canPublishAnnouncements: z.boolean(),
-        canRemoveMembers: z.boolean(),
-        canPublishBlogs: z.boolean(),
-        canManageClubSettings: z.boolean(),
-        canManagePermissions: z.boolean(),
-      }),
-    })
-  ),
+  members: z
+    .array(
+      z.object({
+        user: z.string(),
+        role: z.string(),
+        showcase: z.boolean(),
+        permissions: z.object({
+          canAddMembers: z.boolean(),
+          canPublishAnnouncements: z.boolean(),
+          canRemoveMembers: z.boolean(),
+          canPublishBlogs: z.boolean(),
+          canManageClubSettings: z.boolean(),
+          canManagePermissions: z.boolean(),
+        }),
+      })
+    )
+    .optional(),
   isAvailableForRegistration: z.boolean(),
 });
 
 export const updateClubSchema = z.object({
-  name: z.string().optional(),
-  description: z.string().optional(),
+  name: z.string().min(3).max(255).optional(),
+  description: z.string().min(256).max(1024).optional(),
   profilePic: z.string().optional(),
   banner: z.string().optional(),
   isAvailableForRegistration: z.boolean().optional(),
 });
+
+export const adminUpdateClubSchema = updateClubSchema.merge(z.object({}));
 
 export type LoginUserCredentialsDTO = z.infer<typeof loginUserSchema>;
 export type NewUserCredentialsDTO = z.infer<typeof newUserSchema>;
 export type UpdateUserCredentialsDTO = z.infer<typeof updateUserSchema>;
 export type AdminUpdateUserCredentialsDTO = z.infer<
   typeof adminUpdateUserSchema
+>;
+export type NewClubCredentialsDTO = z.infer<typeof newClubSchema>;
+export type UpdateClubCredentialsDTO = z.infer<typeof updateClubSchema>;
+export type AdminUpdateClubCredentialsDTO = z.infer<
+  typeof adminUpdateClubSchema
 >;

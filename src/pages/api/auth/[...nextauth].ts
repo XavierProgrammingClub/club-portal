@@ -6,7 +6,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import User, { IUser } from "@/models/user";
 import { connectDatabase } from "@/utils/db";
 import { env } from "@/utils/env";
-import { loginSchema } from "@/validators";
+import { loginUserSchema } from "@/validators";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -28,7 +28,7 @@ export const authOptions: NextAuthOptions = {
           };
         });
 
-        credentials = loginSchema.parse(credentials);
+        credentials = loginUserSchema.parse(credentials);
 
         const user = await User.findOne({ email: credentials.email });
         if (!user) {
@@ -82,8 +82,5 @@ export const getCurrentUserDetails = async (ctx: {
   const session = await getServerAuthSession(ctx);
   if (!session) throw new Error("User not logged in!");
 
-  const user = (await User.findById(session.user.id).select(
-    "-password"
-  )) as IUser;
-  return user;
+  return (await User.findById(session.user.id).select("-password")) as IUser;
 };

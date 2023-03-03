@@ -52,7 +52,7 @@ const clubSchema = new mongoose.Schema<IClub>(
     banner: { type: String, required: false },
     members: [
       {
-        user: { ref: "User", required: true },
+        user: { type: "ObjectId", ref: "User", required: true },
         role: { type: "String", required: true },
         showcase: { type: Boolean, default: true },
         permissions: {

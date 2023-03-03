@@ -19,8 +19,8 @@ const blogSchema = new mongoose.Schema<IBlog>(
     title: { type: String, required: true },
     content: { type: String, required: true },
     author: {
-      user: { ref: "User", required: true },
-      club: { ref: "Club", required: true },
+      user: { type: "ObjectId", ref: "User", required: true },
+      club: { type: "ObjectId", ref: "Club", required: true },
     },
     status: {
       type: String,
