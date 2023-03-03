@@ -86,6 +86,11 @@ const AdminSingleClub = () => {
     console.log(response);
   };
 
+  const handleDeleteMember = async (userId: string) => {
+    await axios.delete(`/api/clubs/${id}/members/${userId}`);
+    await queryClient.refetchQueries(["club", id]);
+  };
+
   return (
     <>
       <AdminNavbar />
@@ -160,6 +165,7 @@ const AdminSingleClub = () => {
                 <label htmlFor="canAddMembers">canAddMembers</label>
                 <input
                   type="checkbox"
+                  id="canAddMembers"
                   {...register("permissions.canAddMembers")}
                 />
               </div>
@@ -170,6 +176,7 @@ const AdminSingleClub = () => {
                 </label>
                 <input
                   type="checkbox"
+                  id="canPublishAnnouncements"
                   {...register("permissions.canPublishAnnouncements")}
                 />
               </div>
@@ -178,6 +185,7 @@ const AdminSingleClub = () => {
                 <label htmlFor="canRemoveMembers">canRemoveMembers</label>
                 <input
                   type="checkbox"
+                  id="canRemoveMembers"
                   {...register("permissions.canRemoveMembers")}
                 />
               </div>
@@ -186,6 +194,7 @@ const AdminSingleClub = () => {
                 <label htmlFor="canPublishBlogs">canPublishBlogs</label>
                 <input
                   type="checkbox"
+                  id="canPublishBlogs"
                   {...register("permissions.canPublishBlogs")}
                 />
               </div>
@@ -196,6 +205,7 @@ const AdminSingleClub = () => {
                 </label>
                 <input
                   type="checkbox"
+                  id="canManageClubSettings"
                   {...register("permissions.canManageClubSettings")}
                 />
               </div>
@@ -206,6 +216,7 @@ const AdminSingleClub = () => {
                 </label>
                 <input
                   type="checkbox"
+                  id="canManagePermissions"
                   {...register("permissions.canManagePermissions")}
                 />
               </div>
@@ -218,6 +229,20 @@ const AdminSingleClub = () => {
           </Dialog.Panel>
         </div>
       </Dialog>
+
+      <ul>
+        <p>members</p>
+        {data?.club.members.map((member) => (
+          <li key={member?._id}>
+            <Link href={`/admin/users/${member.user._id}`}>
+              #{member.user._id} {member.user.email} {member.user.name}
+            </Link>
+            <button onClick={() => handleDeleteMember(member.user._id)}>
+              Delete
+            </button>{" "}
+          </li>
+        ))}
+      </ul>
     </>
   );
 };

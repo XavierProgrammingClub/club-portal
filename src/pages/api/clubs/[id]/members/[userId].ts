@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import Club from "@/models/club";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 import { connectDatabase } from "@/utils/db";
-import { updateClubSchema } from "@/validators";
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,6 +10,7 @@ export default async function handler(
 ) {
   const { id: clubId } = req.query;
   const { userId } = req.query;
+  console.log(req.query);
 
   await connectDatabase().catch(() =>
     res.json({ status: "ERROR", message: "Internal Server Error" })
@@ -57,9 +57,15 @@ export default async function handler(
           .json({ status: "ERROR", message: "Unauthorized" });
       }
 
-      Club.findOneAndUpdate(
+      await Club.findOneAndUpdate(
         { _id: clubId },
-        { $pull: { "members.user": userId } }
+        {
+          $pull: {
+            members: {
+              user: userId,
+            },
+          },
+        }
       );
 
       return res.json({ status: "OK", message: "Club deleted successfully!" });

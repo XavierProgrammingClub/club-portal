@@ -21,7 +21,10 @@ export default async function handler(
           @desc Get a club details
         */
     if (req.method === "GET") {
-      const club = await Club.findById(id);
+      const club = await Club.findById(id).populate(
+        "members.user",
+        "-password"
+      );
 
       if (!club)
         return res

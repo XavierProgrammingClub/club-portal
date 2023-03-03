@@ -10,7 +10,8 @@ export interface IClub {
   banner?: string;
   members: [
     {
-      user: string | IUser;
+      _id: string;
+      user: IUser;
       role:
         | "President"
         | "Vice President"
