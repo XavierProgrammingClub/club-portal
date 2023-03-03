@@ -58,8 +58,23 @@ export default async function handler(
       @desc Get all users
     */
     if (req.method === "GET") {
-      const users = await User.find().select("-password");
+      const searchQuery = req.query.search;
+      let filterQuery: any = {};
 
+      if (searchQuery && typeof searchQuery === "string") {
+        // filterQuery.name = new RegExp(searchQuery, "i");
+        // filterQuery.email = new RegExp(searchQuery, "i");
+        filterQuery = {
+          $or: [
+            { name: { $regex: searchQuery, $options: "i" } },
+            { email: { $regex: searchQuery, $options: "i" } },
+          ],
+        };
+      }
+      console.log(req.query.search, filterQuery);
+
+      const users = await User.find(filterQuery).select("-password");
+      console.log(users);
       return res.json({ status: "OK", users });
     }
   } catch (error) {

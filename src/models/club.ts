@@ -18,6 +18,8 @@ export interface IClub {
         | "Active Member"
         | "General Member"
         | string;
+      rank: number;
+      showcase: boolean;
       permissions: {
         canAddMembers: boolean;
         canPublishAnnouncements: boolean;
@@ -54,6 +56,7 @@ const clubSchema = new mongoose.Schema<IClub>(
       {
         user: { type: "ObjectId", ref: "User", required: true },
         role: { type: "String", required: true },
+        rank: { type: Number },
         showcase: { type: Boolean, default: true },
         permissions: {
           canAddMembers: { type: Boolean, required: true },

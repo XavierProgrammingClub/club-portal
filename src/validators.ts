@@ -19,28 +19,27 @@ export const updateUserSchema = z.object({
 
 export const adminUpdateUserSchema = updateUserSchema.merge(z.object({}));
 
+export const newMemberSchema = z.object({
+  user: z.string(),
+  role: z.string(),
+  rank: z.number().optional(),
+  showcase: z.boolean(),
+  permissions: z.object({
+    canAddMembers: z.boolean(),
+    canPublishAnnouncements: z.boolean(),
+    canRemoveMembers: z.boolean(),
+    canPublishBlogs: z.boolean(),
+    canManageClubSettings: z.boolean(),
+    canManagePermissions: z.boolean(),
+  }),
+});
+
 export const newClubSchema = z.object({
   name: z.string(),
   description: z.string(),
   profilePic: z.string(),
   banner: z.string().optional(),
-  members: z
-    .array(
-      z.object({
-        user: z.string(),
-        role: z.string(),
-        showcase: z.boolean(),
-        permissions: z.object({
-          canAddMembers: z.boolean(),
-          canPublishAnnouncements: z.boolean(),
-          canRemoveMembers: z.boolean(),
-          canPublishBlogs: z.boolean(),
-          canManageClubSettings: z.boolean(),
-          canManagePermissions: z.boolean(),
-        }),
-      })
-    )
-    .optional(),
+  members: z.array(newMemberSchema).optional(),
   isAvailableForRegistration: z.boolean(),
 });
 
@@ -65,3 +64,4 @@ export type UpdateClubCredentialsDTO = z.infer<typeof updateClubSchema>;
 export type AdminUpdateClubCredentialsDTO = z.infer<
   typeof adminUpdateClubSchema
 >;
+export type NewMemberCredentialsDTO = z.infer<typeof newMemberSchema>;

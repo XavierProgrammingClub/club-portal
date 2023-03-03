@@ -5,6 +5,10 @@ import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 import { connectDatabase } from "@/utils/db";
 import { newClubSchema } from "@/validators";
 
+export const getClubs = async () => {
+  return Club.find();
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -19,7 +23,7 @@ export default async function handler(
       @desc Get all clubs
     */
     if (req.method === "GET") {
-      const clubs = await Club.find();
+      const clubs = await getClubs();
 
       return res.json({ status: "OK", clubs });
     }
