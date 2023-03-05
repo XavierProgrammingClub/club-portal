@@ -1,6 +1,6 @@
 name: Hello World
 
-on: []
+on: [push]
 
 jobs:
   build:
