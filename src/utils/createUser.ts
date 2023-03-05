@@ -90,7 +90,6 @@ const validate = (input: any, zodSchema: z.Schema) => {
 //         process.exit(0);
 //       });
 //   });
-console.log("HEY");
 const init = async () => {
   const values = process.argv.slice(2);
 
@@ -100,7 +99,6 @@ const init = async () => {
   const role = values[3] === "true" ? "superuser" : "user";
 
   set("strictQuery", false);
-  console.log(process.env.MONGODB_URI);
   await connect(process.env.MONGODB_URI as string);
   const salt = await bcrypt.genSalt(12);
   const hashedPassword = await bcrypt.hash(password, salt);
