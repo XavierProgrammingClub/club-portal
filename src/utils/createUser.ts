@@ -1,13 +1,12 @@
 import bcrypt from "bcryptjs";
 import * as dotenv from "dotenv";
 import inquirer from "inquirer";
-import { connect } from "mongoose";
+import { connect, set } from "mongoose";
 import { z } from "zod";
 
 import User from "../models/user.js";
 
 dotenv.config();
-
 const validate = (input: any, zodSchema: z.Schema) => {
   const parsed = zodSchema.safeParse(input);
   if (parsed.success) return true;
@@ -91,7 +90,7 @@ const validate = (input: any, zodSchema: z.Schema) => {
 //         process.exit(0);
 //       });
 //   });
-
+console.log("HEY");
 const init = async () => {
   const values = process.argv.slice(2);
 
@@ -100,6 +99,8 @@ const init = async () => {
   const password = values[2];
   const role = values[3] === "true" ? "superuser" : "user";
 
+  set("strictQuery", false);
+  console.log(process.env.MONGODB_URI);
   await connect(process.env.MONGODB_URI as string);
   const salt = await bcrypt.genSalt(12);
   const hashedPassword = await bcrypt.hash(password, salt);
@@ -115,6 +116,8 @@ const init = async () => {
   process.exit(0);
 };
 
-init().catch((err: Error) => console.log);
+init().catch((err: Error) => {
+  console.log(err);
+});
 
 export {};

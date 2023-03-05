@@ -1,4 +1,4 @@
-name: Hello World
+name: Create User
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ on:
         default: false
 
 jobs:
-  build:
+  create_user:
     runs-on: ubuntu-latest    
     steps:
       - uses: actions/setup-node@v3
