@@ -3,7 +3,7 @@ name: Hello World
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
+      name:
         description: "What's the name of user?"
         required: true
       admin:
@@ -20,4 +20,4 @@ jobs:
           node-version: 16
       - uses: actions/checkout@v3
       - run: npm install
-      - run: npm src/utils/createUser.ts
+      - run: npm run new-user ${{ github.event.inputs.name }} ${{ github.event.inputs.admin }}
