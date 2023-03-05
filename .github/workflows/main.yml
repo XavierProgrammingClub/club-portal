@@ -1,0 +1,13 @@
+name: Hello World
+
+on: []
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: node-16
+    
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm install
+      - run: npm src/utils/createUser.ts
