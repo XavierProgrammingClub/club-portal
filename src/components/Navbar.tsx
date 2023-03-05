@@ -40,6 +40,7 @@ export const Navbar = () => {
   return (
     <nav>
       <Link href="/">Home </Link>
+      <Link href="/clubs">Clubs </Link>
       {renderAuthLinks()}
     </nav>
   );

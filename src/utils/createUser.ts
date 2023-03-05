@@ -1,7 +1,12 @@
+import bcrypt from "bcryptjs";
+import * as dotenv from "dotenv";
 import inquirer from "inquirer";
+import { connect } from "mongoose";
 import { z } from "zod";
 
-import User from "../models/user";
+import User from "../models/user.js";
+
+dotenv.config();
 
 const validate = (input: any, zodSchema: z.Schema) => {
   const parsed = zodSchema.safeParse(input);
@@ -66,12 +71,24 @@ inquirer
       "We can't upload photos here, so creating user with default profile picture...\n"
     );
 
-    User.create(answers)
+    connect(process.env.MONGODB_URI as string)
+      .then(() => {
+        return bcrypt.genSalt(12);
+      })
+      .then((salt) => {
+        return bcrypt.hash(answers.password, salt);
+      })
+      .then((password) => {
+        return User.create({ ...answers, password });
+      })
       .then(() => {
         console.log("User created successfully! 😀");
       })
-      .catch((err) => {
+      .catch((err: Error) => {
         console.log("Error creating user", err.message);
+      })
+      .finally(() => {
+        process.exit(0);
       });
   });
 

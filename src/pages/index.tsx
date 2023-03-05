@@ -1,9 +1,8 @@
-import mongoose from "mongoose";
 import { GetStaticProps, InferGetStaticPropsType } from "next";
 import { Inter } from "next/font/google";
 import Head from "next/head";
 
-import { getClubs } from "@/pages/api/clubs";
+import Club from "@/models/club";
 import { connectDatabase } from "@/utils/db";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -28,9 +27,10 @@ export default function Home(
 export const getStaticProps: GetStaticProps = async (context) => {
   await connectDatabase();
 
-  const clubs = await getClubs();
+  const clubs = await Club.find().limit(5);
 
   return {
     props: { clubs: JSON.parse(JSON.stringify(clubs)) },
+    revalidate: 100,
   };
 };

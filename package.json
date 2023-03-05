@@ -9,6 +9,7 @@
     "lint": "next lint",
     "new-user": "ts-node src/utils/createUser"
   },
+  "type": "module",
   "dependencies": {
     "@headlessui/react": "^1.7.12",
     "@hookform/resolvers": "^2.9.11",
@@ -42,6 +43,7 @@
     "@types/lodash.debounce": "^4.0.7",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
+    "dotenv": "^16.0.3",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "^4.2.1",
