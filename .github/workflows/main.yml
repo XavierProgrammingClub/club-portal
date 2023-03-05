@@ -4,12 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       name:
-        description: "What's the name of user?"
+        description: "Full name"
         required: true
+      email:
+          description: "Email Address"
+          required: true
+      password:
+          description: "Password"
+          required: true
       admin:
         description: 'Is this user going to be admin?'
         required: false
         type: boolean
+        default: false
 
 jobs:
   build:
@@ -20,4 +27,4 @@ jobs:
           node-version: 16
       - uses: actions/checkout@v3
       - run: npm install
-      - run: npm run new-user ${{ github.event.inputs.name }} ${{ github.event.inputs.admin }}
+      - run: npm run new-user $name $email $password $admin

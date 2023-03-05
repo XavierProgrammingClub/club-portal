@@ -15,81 +15,106 @@ const validate = (input: any, zodSchema: z.Schema) => {
   return parsed.error.issues[0].message;
 };
 
-inquirer
-  .prompt([
-    {
-      type: "input",
-      name: "name",
-      message: "What name should I give to the user?",
-      validate(input) {
-        return validate(
-          input,
-          z
-            .string()
-            .min(3, { message: "Name must be at least 3 characters" })
-            .max(255, { message: "Name must not exceed 255 characters" })
-        );
-      },
-    },
-    {
-      type: "input",
-      name: "email",
-      message: "What email should I give to the user?",
-      validate(input) {
-        return validate(
-          input,
-          z.string().email({
-            message: "Ooops! The email that you entered is invalid 🤧",
-          })
-        );
-      },
-    },
-    {
-      type: "password",
-      name: "password",
-      validate(input) {
-        return validate(
-          input,
-          z.string().min(6, {
-            message:
-              "We value your security, so please enter password >= 6 characters",
-          })
-        );
-      },
-    },
-    {
-      type: "confirm",
-      name: "role",
-      message: "Do you want this user to be admin?",
-    },
-  ])
-  .then((answers) => {
-    if (answers.role) answers.role = "superuser";
-    else answers.role = "user";
+// inquirer
+//   .prompt([
+//     {
+//       type: "input",
+//       name: "name",
+//       message: "What name should I give to the user?",
+//       validate(input) {
+//         return validate(
+//           input,
+//           z
+//             .string()
+//             .min(3, { message: "Name must be at least 3 characters" })
+//             .max(255, { message: "Name must not exceed 255 characters" })
+//         );
+//       },
+//     },
+//     {
+//       type: "input",
+//       name: "email",
+//       message: "What email should I give to the user?",
+//       validate(input) {
+//         return validate(
+//           input,
+//           z.string().email({
+//             message: "Ooops! The email that you entered is invalid 🤧",
+//           })
+//         );
+//       },
+//     },
+//     {
+//       type: "password",
+//       name: "password",
+//       validate(input) {
+//         return validate(
+//           input,
+//           z.string().min(6, {
+//             message:
+//               "We value your security, so please enter password >= 6 characters",
+//           })
+//         );
+//       },
+//     },
+//     {
+//       type: "confirm",
+//       name: "role",
+//       message: "Do you want this user to be admin?",
+//     },
+//   ])
+//   .then((answers) => {
+//     if (answers.role) answers.role = "superuser";
+//     else answers.role = "user";
+//
+//     console.log(
+//       "We can't upload photos here, so creating user with default profile picture...\n"
+//     );
+//
+//     connect(process.env.MONGODB_URI as string)
+//       .then(() => {
+//         return bcrypt.genSalt(12);
+//       })
+//       .then((salt) => {
+//         return bcrypt.hash(answers.password, salt);
+//       })
+//       .then((password) => {
+//         return User.create({ ...answers, password });
+//       })
+//       .then(() => {
+//         console.log("User created successfully! 😀");
+//       })
+//       .catch((err: Error) => {
+//         console.log("Error creating user", err.message);
+//       })
+//       .finally(() => {
+//         process.exit(0);
+//       });
+//   });
 
-    console.log(
-      "We can't upload photos here, so creating user with default profile picture...\n"
-    );
+const init = async () => {
+  const values = process.argv.slice(2);
 
-    connect(process.env.MONGODB_URI as string)
-      .then(() => {
-        return bcrypt.genSalt(12);
-      })
-      .then((salt) => {
-        return bcrypt.hash(answers.password, salt);
-      })
-      .then((password) => {
-        return User.create({ ...answers, password });
-      })
-      .then(() => {
-        console.log("User created successfully! 😀");
-      })
-      .catch((err: Error) => {
-        console.log("Error creating user", err.message);
-      })
-      .finally(() => {
-        process.exit(0);
-      });
+  const name = values[0];
+  const email = values[1];
+  const password = values[2];
+  const role = values[3] === "true" ? "superuser" : "user";
+
+  await connect(process.env.MONGODB_URI as string);
+  const salt = await bcrypt.genSalt(12);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  await User.create({
+    name,
+    email,
+    password: hashedPassword,
+    role,
   });
+
+  console.log("User created successfully");
+  process.exit(0);
+};
+
+init().catch((err: Error) => console.log);
 
 export {};
