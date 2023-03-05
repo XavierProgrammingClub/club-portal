@@ -1,22 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
 import { AdminNavbar } from "@/components/AdminNavbar";
+import { useClubs } from "@/hooks/useClub";
 import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
-import { IClub } from "@/models/club";
 import { queryClient } from "@/pages/_app";
-
-const getClubs = async (): Promise<{
-  status: "OK" | "ERROR";
-  clubs: IClub[];
-}> => {
-  return axios.get("/api/clubs/");
-};
 
 const Clubs = () => {
   const { data: userData } = useUser();
-  const { data, isLoading, isError } = useQuery(["all-clubs"], getClubs);
+  const { data, isLoading, isError } = useClubs();
 
   if (!userData?.user || !(userData?.user.role === "superuser")) return;
 

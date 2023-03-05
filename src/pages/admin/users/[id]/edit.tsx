@@ -14,13 +14,13 @@ import {
   AdminUpdateUserCredentialsDTO,
   adminUpdateUserSchema,
 } from "@/validators";
-const getUser = async (
-  id: string
-): Promise<{
+const getUser = async (data: {
+  id: string;
+}): Promise<{
   status: "OK" | "ERROR";
   user: IUser;
 }> => {
-  return axios.get(`/api/users/${id}`);
+  return axios.get(`/api/users/${data.id}`);
 };
 
 const AdminSingleUserEdit = () => {
@@ -42,10 +42,11 @@ const AdminSingleUserEdit = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const { data } = useQuery(["user", id], () => getUser(id as string), {
+  const { data } = useQuery(["user", id], () => getUser({ id: id as string }), {
     onSuccess: (data) => {
       reset(data.user);
     },
+    enabled: router.isReady,
   });
 
   if (!userData?.user || !(userData?.user.role === "superuser")) return;

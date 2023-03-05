@@ -1,31 +1,22 @@
 import { Dialog } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
 import debounce from "lodash.debounce";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { CldImage } from "next-cloudinary";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import Select from "react-select";
+import Select, { SingleValue } from "react-select";
 import AsyncSelect from "react-select/async";
 
 import { AdminNavbar } from "@/components/AdminNavbar";
+import { clubMembersRole, defaultPermissions } from "@/constants";
+import { useSingleClub } from "@/hooks/useClub";
 import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
-import { IClub } from "@/models/club";
 import { IUser } from "@/models/user";
 import { queryClient } from "@/pages/_app";
 import { NewMemberCredentialsDTO, newMemberSchema } from "@/validators";
-
-const getClub = async (
-  id: string
-): Promise<{
-  status: "OK" | "ERROR";
-  club: IClub;
-}> => {
-  return axios.get(`/api/clubs/${id}`);
-};
 
 const getUsers = async (
   searchQuery: string
@@ -57,14 +48,16 @@ const AdminSingleClub = () => {
 
   const { id } = router.query;
 
-  const { data, isLoading, isError } = useQuery(["club", id], () =>
-    getClub(id as string)
-  );
+  const { data, isLoading, isError } = useSingleClub({
+    id: id as string,
+    enabled: router.isReady,
+  });
 
   const {
     register,
     handleSubmit,
     setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<NewMemberCredentialsDTO>({
     resolver: zodResolver(newMemberSchema),
@@ -72,6 +65,8 @@ const AdminSingleClub = () => {
     mode: "all",
   });
   console.log(errors);
+
+  const values = getValues();
 
   const loadOptions = debounce((inputText: string, callback) => {
     getUsers(inputText).then((data) => callback(data.users));
@@ -89,6 +84,20 @@ const AdminSingleClub = () => {
   const handleDeleteMember = async (userId: string) => {
     await axios.delete(`/api/clubs/${id}/members/${userId}`);
     await queryClient.refetchQueries(["club", id]);
+  };
+
+  const handleRoleSelectChange = (
+    val: SingleValue<{ value: string; label: string }>
+  ) => {
+    setValue("role", val?.value as string);
+    const userPermission = clubMembersRole.find(
+      (role) => role.title === val?.value
+    );
+    if (!userPermission) {
+      return setValue("permissions", defaultPermissions);
+    }
+
+    setValue("permissions", userPermission.permissions);
   };
 
   return (
@@ -146,8 +155,15 @@ const AdminSingleClub = () => {
 
               <div>
                 <Select
-                  options={[{ value: "President", label: "President" }]}
-                  onChange={(val) => setValue("role", val?.value as string)}
+                  options={[
+                    { value: "President", label: "President" },
+                    { value: "Vice President", label: "Vice President" },
+                    { value: "Secretary", label: "Secretary" },
+                    { value: "Treasurer", label: "Treasurer" },
+                    { value: "Active Member", label: "Active Member" },
+                    { value: "General Member", label: "General Member" },
+                  ]}
+                  onChange={handleRoleSelectChange}
                 />
               </div>
 

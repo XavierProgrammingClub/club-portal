@@ -5,6 +5,7 @@ import { CldImage, CldUploadButton } from "next-cloudinary";
 import { useForm } from "react-hook-form";
 
 import { AdminNavbar } from "@/components/AdminNavbar";
+import { useSingleClub } from "@/hooks/useClub";
 import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
 import { IClub } from "@/models/club";
@@ -42,10 +43,12 @@ const AdmingSingleClubEdit = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const { data } = useQuery(["club", id], () => getClub(id as string), {
+  const { data } = useSingleClub({
+    id: id as string,
     onSuccess: (data) => {
       reset(data.club);
     },
+    enabled: router.isReady,
   });
 
   if (!userData?.user || !(userData?.user.role === "superuser")) return;

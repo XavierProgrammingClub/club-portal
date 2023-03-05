@@ -10,6 +10,8 @@ import { CloudinaryImage } from "@/types/cloudinary";
 import { UpdateUserCredentialsDTO, updateUserSchema } from "@/validators";
 
 const ProfileEdit = () => {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -27,9 +29,8 @@ const ProfileEdit = () => {
     onSuccess: (data) => {
       reset(data.user);
     },
+    enabled: router.isReady,
   });
-
-  const router = useRouter();
 
   const handleUpdateUser = async (data: UpdateUserCredentialsDTO) => {
     await axios.patch(`/api/users/info`, data);

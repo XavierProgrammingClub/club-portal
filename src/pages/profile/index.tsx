@@ -1,23 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { CldImage } from "next-cloudinary";
 
+import { useUserClubs } from "@/hooks/useClub";
 import { useUser } from "@/hooks/useUser";
-import { axios } from "@/lib/axios";
-import { IClub } from "@/models/club";
-
-const getClubs = async (): Promise<{
-  status: "ERROR" | "OK";
-  message: string;
-  clubs: IClub[];
-}> => {
-  return axios.get("/api/users/info/clubs");
-};
 
 const Index = () => {
   const { data, isLoading } = useUser();
-  const { data: clubsData } = useQuery(["user-clubs"], getClubs);
+  const { data: clubsData } = useUserClubs();
   const router = useRouter();
 
   if (isLoading) return null;

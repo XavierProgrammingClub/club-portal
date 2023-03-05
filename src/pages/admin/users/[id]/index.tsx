@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { CldImage } from "next-cloudinary";
+import { useEffect } from "react";
 
 import { AdminNavbar } from "@/components/AdminNavbar";
 import { useUser } from "@/hooks/useUser";
@@ -21,8 +22,10 @@ const AdminSingleUser = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const { data, isLoading, isError } = useQuery(["user", id], () =>
-    getUser(id as string)
+  const { data, isLoading, isError } = useQuery(
+    ["user", id],
+    () => getUser(id as string),
+    { enabled: router.isReady }
   );
 
   if (!userData?.user || !(userData?.user.role === "superuser")) return;
