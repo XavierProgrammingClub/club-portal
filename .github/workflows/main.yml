@@ -1,6 +1,15 @@
 name: Hello World
 
-on: [push]
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "What's the name of user?"
+        required: true
+      admin:
+        description: 'Is this user going to be admin?'
+        required: false
+        type: boolean
 
 jobs:
   build:
