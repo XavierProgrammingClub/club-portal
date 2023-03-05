@@ -13,10 +13,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    container: node-16
-    
+    runs-on: ubuntu-latest    
     steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
       - uses: actions/checkout@v3
       - run: npm install
       - run: npm src/utils/createUser.ts
