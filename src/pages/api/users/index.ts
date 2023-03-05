@@ -2,7 +2,6 @@ import { genSalt, hash } from "bcryptjs";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import User from "@/models/user";
-import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 import { connectDatabase } from "@/utils/db";
 import { newUserSchema } from "@/validators";
 
@@ -47,11 +46,11 @@ export default async function handler(
         user: newUser,
       });
     }
-
-    const user = await getCurrentUserDetails({ req, res });
-    if (!user || !(user.role === "superuser")) {
-      return res.status(401).json({ status: "ERROR", message: "Unauthorized" });
-    }
+    //
+    // const user = await getCurrentUserDetails({ req, res });
+    // if (!user || !(user.role === "superuser")) {
+    //   return res.status(401).json({ status: "ERROR", message: "Unauthorized" });
+    // }
 
     /*
       @GET /api/users
@@ -62,8 +61,6 @@ export default async function handler(
       let filterQuery: any = {};
 
       if (searchQuery && typeof searchQuery === "string") {
-        // filterQuery.name = new RegExp(searchQuery, "i");
-        // filterQuery.email = new RegExp(searchQuery, "i");
         filterQuery = {
           $or: [
             { name: { $regex: searchQuery, $options: "i" } },
@@ -71,10 +68,8 @@ export default async function handler(
           ],
         };
       }
-      console.log(req.query.search, filterQuery);
 
       const users = await User.find(filterQuery).select("-password");
-      console.log(users);
       return res.json({ status: "OK", users });
     }
   } catch (error) {

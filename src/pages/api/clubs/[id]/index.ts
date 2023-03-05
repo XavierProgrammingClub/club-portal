@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import Club from "@/models/club";
@@ -20,6 +21,7 @@ export default async function handler(
           @GET /api/clubs/:id
           @desc Get a club details
         */
+
     if (req.method === "GET") {
       const club = await Club.findById(id).populate(
         "members.user",
@@ -64,12 +66,14 @@ export default async function handler(
       const club = await Club.find({
         _id: id,
         members: {
-          user: user._id,
-          permissions: { canManageClubSettings: true },
+          $elemMatch: {
+            user: user._id,
+            "permissions.canManageClubSettings": true,
+          },
         },
       });
 
-      if (!(user.role === "superuser") && !club) {
+      if (!(user.role === "superuser") && club.length <= 0) {
         return res
           .status(401)
           .json({ status: "ERROR", message: "Unauthorized" });

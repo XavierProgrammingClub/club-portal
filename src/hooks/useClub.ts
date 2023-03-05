@@ -29,7 +29,7 @@ export const useSingleClub = ({
   enabled,
 }: {
   id: string;
-  onSuccess?: (club: { status: "OK" | "ERROR"; club: IClub }) => void;
+  onSuccess?: (club: Awaited<ReturnType<typeof getSingleClub>>) => void;
   enabled?: boolean;
 }) => {
   return useQuery(["club", id], () => getSingleClub(id), {

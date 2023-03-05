@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import Club from "@/models/club";
@@ -51,19 +52,23 @@ export default async function handler(
       const club = await Club.find({
         _id: id,
         members: {
-          user: user._id,
-          permissions: { canAddMembers: true },
+          $elemMatch: {
+            user: user._id,
+            "permissions.canAddMembers": true,
+          },
         },
       });
 
-      if (!(user.role === "superuser") && !club) {
+      if (!(user.role === "superuser") && club.length <= 0) {
         return res
           .status(401)
           .json({ status: "ERROR", message: "Unauthorized" });
       }
 
-      // const club = await Club.findById(id).populate("members.user");
-      await Club.updateOne({ _id: id }, { $push: { members: data } });
+      await Club.updateOne(
+        { _id: id, "members.user": { $ne: data.user } },
+        { $push: { members: data } }
+      );
 
       if (!club)
         return res

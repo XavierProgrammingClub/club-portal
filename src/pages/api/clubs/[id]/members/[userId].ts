@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import Club from "@/models/club";
@@ -43,15 +44,25 @@ export default async function handler(
                   @desc Delete a club
                 */
     if (req.method === "DELETE") {
+      if (
+        (user._id as unknown as mongoose.Types.ObjectId).toHexString() ===
+        userId
+      )
+        return res
+          .status(400)
+          .json({ status: "ERROR", message: "You can't delete yourself" });
+
       const club = await Club.find({
         _id: clubId,
         members: {
-          user: user._id,
-          permissions: { canRemoveMembers: true },
+          $elemMatch: {
+            user: user._id,
+            "permissions.canRemoveMembers": true,
+          },
         },
       });
 
-      if (!(user.role === "superuser") && !club) {
+      if (!(user.role === "superuser") && club.length <= 0) {
         return res
           .status(401)
           .json({ status: "ERROR", message: "Unauthorized" });
@@ -68,7 +79,10 @@ export default async function handler(
         }
       );
 
-      return res.json({ status: "OK", message: "Club deleted successfully!" });
+      return res.json({
+        status: "OK",
+        message: "Member deleted successfully!",
+      });
     }
 
     /*
@@ -79,12 +93,14 @@ export default async function handler(
       const club = await Club.find({
         _id: clubId,
         members: {
-          user: user._id,
-          permissions: { canManagePermissions: true },
+          $elemMatch: {
+            user: user._id,
+            "permissions.canManagePermissions": true,
+          },
         },
       });
 
-      if (!(user.role === "superuser") && !club) {
+      if (!(user.role === "superuser") && club.length <= 0) {
         return res
           .status(401)
           .json({ status: "ERROR", message: "Unauthorized" });
