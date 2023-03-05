@@ -27,4 +27,4 @@ jobs:
           node-version: 16
       - uses: actions/checkout@v3
       - run: npm install
-      - run: npm run new-user $name $email $password $admin
+      - run: npm run new-user ${{ github.event.inputs.name }} ${{ github.event.inputs.email }} ${{ github.event.inputs.password }} ${{ github.event.inputs.admin }}
