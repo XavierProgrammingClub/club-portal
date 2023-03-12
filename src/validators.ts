@@ -1,8 +1,10 @@
 import { z } from "zod";
 
 export const loginUserSchema = z.object({
-  email: z.string(),
-  password: z.string(),
+  email: z.string().email(),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters long" }),
 });
 
 export const newUserSchema = z.object({
@@ -45,7 +47,7 @@ export const newClubSchema = z.object({
 
 export const updateClubSchema = z.object({
   name: z.string().min(3).max(255).optional(),
-  description: z.string().min(256).max(1024).optional(),
+  description: z.string().min(3).max(1024).optional(),
   profilePic: z.string().optional(),
   banner: z.string().optional(),
   isAvailableForRegistration: z.boolean().optional(),

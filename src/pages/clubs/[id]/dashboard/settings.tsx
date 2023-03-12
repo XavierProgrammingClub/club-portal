@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/router";
 import { CldImage, CldUploadButton } from "next-cloudinary";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
-import { AdminNavbar } from "@/components/AdminNavbar";
+import { ClubDashboardNavbar } from "@/components/ClubDashboardNavbar";
 import { useSingleClub } from "@/hooks/useClub";
 import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
@@ -14,8 +15,19 @@ import {
   adminUpdateClubSchema,
 } from "@/validators";
 
-const AdmingSingleClubEdit = () => {
-  const { data: userData } = useUser();
+const ClubSettings = () => {
+  const router = useRouter();
+  const { id } = router.query;
+
+  const { data: userData, isLoading: isUserLoading } = useUser();
+
+  const { data, isLoading: isClubLoading } = useSingleClub({
+    id: id as string,
+    onSuccess: (data) => {
+      reset(data.club);
+    },
+    enabled: router.isReady,
+  });
 
   const {
     register,
@@ -30,18 +42,23 @@ const AdmingSingleClubEdit = () => {
     mode: "all",
   });
 
-  const router = useRouter();
-  const { id } = router.query;
+  const currentUserPermissions = useMemo(
+    () =>
+      data?.club.members.find((d) => d.user._id === userData?.user._id)
+        ?.permissions,
+    [data]
+  );
 
-  const { data } = useSingleClub({
-    id: id as string,
-    onSuccess: (data) => {
-      reset(data.club);
-    },
-    enabled: router.isReady,
-  });
+  if (isUserLoading || isClubLoading) {
+    return;
+  }
 
-  if (!userData?.user || !(userData?.user.role === "superuser")) return;
+  const isSuperUser = userData?.user.role === "superuser";
+  if (!isSuperUser && !currentUserPermissions?.canManageClubSettings) {
+    router.push(`/clubs/${id}/dashboard`).then(() => {
+      return null;
+    });
+  }
 
   const handleUpdateClub = async (data: AdminUpdateClubCredentialsDTO) => {
     await axios.patch(`/api/clubs/${id}`, data);
@@ -57,11 +74,10 @@ const AdmingSingleClubEdit = () => {
   };
 
   const values = getValues();
-  console.log(errors);
 
   return (
     <>
-      <AdminNavbar />
+      <ClubDashboardNavbar />
 
       {values.profilePic ? (
         <CldImage
@@ -111,4 +127,4 @@ const AdmingSingleClubEdit = () => {
   );
 };
 
-export default AdmingSingleClubEdit;
+export default ClubSettings;

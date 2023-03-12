@@ -1,12 +1,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { GetServerSideProps } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
+import { Input, Button } from "@/components/ui";
+import { useUser } from "@/hooks/useUser";
 import { queryClient } from "@/pages/_app";
-import { getServerAuthSession } from "@/pages/api/auth/[...nextauth]";
 import { LoginUserCredentialsDTO, loginUserSchema } from "@/validators";
+
+import styles from "./signin.module.css";
 
 const SignIn = () => {
   const {
@@ -15,11 +19,18 @@ const SignIn = () => {
     formState: { errors, isSubmitting },
   } = useForm<LoginUserCredentialsDTO>({
     resolver: zodResolver(loginUserSchema),
-    reValidateMode: "onBlur",
     mode: "all",
   });
 
+  const { data: userData, isLoading } = useUser();
+
   const router = useRouter();
+
+  if (isLoading) return null;
+  if (userData?.user) {
+    router.push("/");
+    return;
+  }
 
   const handleLogin = async (data: LoginUserCredentialsDTO) => {
     const response = await signIn("credentials", {
@@ -30,34 +41,67 @@ const SignIn = () => {
 
     await queryClient.refetchQueries(["current-user"]);
     if (response?.ok) return router.push("/");
-    console.log(response);
+    if (response?.error) {
+      toast(response.error, { type: "error" });
+    }
   };
 
-  console.log(errors);
-
   return (
-    <form onSubmit={handleSubmit(handleLogin)}>
-      <input type="email" placeholder="Email" {...register("email")} />
-      <input type="password" placeholder="Password" {...register("password")} />
-      <button disabled={isSubmitting}>Login</button>
-    </form>
+    <>
+      <main className={styles.signinWrapper}>
+        <div className={styles.signinContainer}>
+          <div className={`${styles.signinBlock} ${styles.mainBlock}`}>
+            <h1 className={styles.mainBlock__title}>Sign in</h1>
+          </div>
+
+          <form
+            className={styles.signinBlock}
+            onSubmit={handleSubmit(handleLogin)}
+          >
+            <Input
+              label="Email"
+              placeholder="sub@xavier.edu.np"
+              autoFocus
+              required
+              {...register("email")}
+              error={errors.email?.message}
+            />
+
+            <Input
+              label="Password"
+              placeholder="********"
+              type="password"
+              required
+              {...register("password")}
+              error={errors.password?.message}
+            />
+
+            <Link className={styles.forgotPassword} href={"/"}>
+              Forgot Password?
+            </Link>
+
+            <Button disabled={isSubmitting}>Sign In</Button>
+          </form>
+        </div>
+      </main>
+    </>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getServerAuthSession(context);
-
-  if (session)
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-
-  return {
-    props: { session },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   const session = await getServerAuthSession(context);
+//
+//   if (session)
+//     return {
+//       redirect: {
+//         destination: "/",
+//         permanent: false,
+//       },
+//     };
+//
+//   return {
+//     props: { session },
+//   };
+// };
 
 export default SignIn;

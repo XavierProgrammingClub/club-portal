@@ -1,0 +1,36 @@
+.signinWrapper {
+  background: url("/auth/auth-bg.png") no-repeat;
+  display: grid;
+  height: 100vh;
+  place-items: center;
+}
+
+.signinContainer {
+  background: var(--bg-primary);
+  max-width: min(95vw, 35rem);
+  border-radius: var(--radius-500);
+  width: 100%;
+  box-shadow: rgba(140, 144, 164, 0.08) 0px 5px 20px;
+  margin: 6.25rem 0;
+}
+
+.signinBlock {
+  padding: 1.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5625rem;
+}
+
+.mainBlock {
+  border-bottom: 1px solid var(--clr-shade-400);
+  padding: 1.25rem;
+}
+
+.mainBlock__title {
+  text-align: center;
+  font-size: var(--fs-500);
+}
+
+.forgotPassword {
+  text-align: right;
+}

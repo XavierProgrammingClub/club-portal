@@ -4,7 +4,12 @@ import { axios } from "@/lib/axios";
 import { IUser } from "@/models/user";
 
 const getUser = async (): Promise<{ status: "OK" | "ERROR"; user: IUser }> => {
-  return axios.get("/api/users/info");
+  const data = (await axios.get("/api/users/info")) as {
+    status: "OK" | "ERROR";
+    user: IUser;
+  };
+  console.log("DATA", data);
+  return data;
 };
 
 export const useUser = (context?: {

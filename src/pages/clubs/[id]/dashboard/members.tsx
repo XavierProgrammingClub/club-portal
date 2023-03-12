@@ -4,18 +4,16 @@ import debounce from "lodash.debounce";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { CldImage } from "next-cloudinary";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import Select, { SingleValue } from "react-select";
 import AsyncSelect from "react-select/async";
 
-import { AdminNavbar } from "@/components/AdminNavbar";
 import { ClubDashboardNavbar } from "@/components/ClubDashboardNavbar";
 import { clubMembersRole, defaultPermissions } from "@/constants";
 import { useSingleClub } from "@/hooks/useClub";
 import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
-import club from "@/models/club";
 import { IUser } from "@/models/user";
 import { queryClient } from "@/pages/_app";
 import { NewMemberCredentialsDTO, newMemberSchema } from "@/validators";
@@ -43,14 +41,13 @@ const formatOptionLabel = (value: IUser) => {
 };
 
 const AdminSingleClub = () => {
-  const { data: userData } = useUser();
   const router = useRouter();
 
+  const { id } = router.query;
   const [isModalOpened, setIsModalOpened] = useState(false);
 
-  const { id } = router.query;
-
-  const { data, isLoading, isError } = useSingleClub({
+  const { data: userData, isLoading: isUserLoading } = useUser();
+  const { data, isLoading: isClubLoading } = useSingleClub({
     id: id as string,
     enabled: router.isReady,
   });
@@ -59,8 +56,7 @@ const AdminSingleClub = () => {
     register,
     handleSubmit,
     setValue,
-    getValues,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<NewMemberCredentialsDTO>({
     resolver: zodResolver(newMemberSchema),
     reValidateMode: "onBlur",
@@ -71,13 +67,21 @@ const AdminSingleClub = () => {
       )?.permissions,
     },
   });
-  // console.log(errors);
 
   const loadOptions = debounce((inputText: string, callback) => {
     getUsers(inputText).then((data) => callback(data.users));
   }, 1000);
 
-  if (!userData?.user && !(userData?.user.role === "superuser")) return;
+  const currentClubUser = useMemo(
+    () => data?.club.members.find((d) => d.user._id === userData?.user._id),
+    [data]
+  );
+  if (!currentClubUser) return;
+
+  const currentUserPermissions = currentClubUser?.permissions;
+  if (isUserLoading || isClubLoading) return;
+  const isSuperUser = userData?.user.role === "superuser";
+
   const handleAddMember = async (data: NewMemberCredentialsDTO) => {
     const response = await axios.post(`/api/clubs/${id}/members/`, data);
     setIsModalOpened(false);
@@ -103,14 +107,6 @@ const AdminSingleClub = () => {
 
     setValue("permissions", userPermission.permissions);
   };
-
-  const isSuperUser = userData.user.role === "superuser";
-  const currentUserPermissions = data?.club.members.find(
-    (d) => d.user._id === userData.user._id
-  )?.permissions;
-  if (!currentUserPermissions) return;
-
-  console.log(currentUserPermissions);
 
   return (
     <>

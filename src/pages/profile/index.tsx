@@ -16,6 +16,8 @@ const Index = () => {
     return;
   }
 
+  if (!data) return;
+
   return (
     <>
       {data ? (
