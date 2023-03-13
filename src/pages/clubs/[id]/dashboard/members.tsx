@@ -25,7 +25,7 @@ import { openConfirmModal } from "@mantine/modals";
 import { IconEdit, IconSearch, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 
 import { ClubDashboardLayout } from "@/components/ClubDashboardLayout";
 import { DashboardBreadCrumb } from "@/components/DashboardBreadCrumb";
@@ -307,15 +307,15 @@ const EditMemberDrawer = (props: MemberDrawerProps & { memberId: string }) => {
     id: id as string,
   });
 
-  useEffect(() => {
-    if (!clubsData || !props.opened || !props.memberId) return;
-
-    const user = clubsData?.club.members.find(
+  const userData = useMemo(() => {
+    const data = clubsData?.club.members.find(
       (member) => member._id === props.memberId
     );
-    if (!user) return props.onClose();
 
-    form.setValues(user);
+    if (!data) return props.onClose();
+
+    form.setValues(data);
+    return data;
   }, [props.opened]);
 
   const handleUpdateMember = async (data: UpdateMemberCredentialsDTO) => {
@@ -337,6 +337,28 @@ const EditMemberDrawer = (props: MemberDrawerProps & { memberId: string }) => {
 
   return (
     <Drawer opened={props.opened} onClose={props.onClose} title="Update Member">
+      <Group spacing="sm">
+        <Avatar
+          size={40}
+          src={`https://res.cloudinary.com/dmixkq1uo/image/upload/w_50/${userData?.user?.profilePic}`}
+          radius={40}
+          sx={{ objectFit: "cover" }}
+        />
+        <div>
+          <Anchor
+            component={Link}
+            href={`/users/${userData?.user?._id}`}
+            fz="sm"
+            fw={500}
+          >
+            {userData?.user?.name}
+          </Anchor>
+          <Text fz="xs" c="dimmed">
+            {userData?.user?.email}
+          </Text>
+        </div>
+      </Group>
+
       <form onSubmit={form.onSubmit(handleUpdateMember)}>
         <Autocomplete
           label="Role"
