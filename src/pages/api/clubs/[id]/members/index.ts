@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import Club from "@/models/club";
+import User from "@/models/user";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 import { connectDatabase } from "@/utils/db";
 import { newMemberSchema } from "@/validators";
@@ -65,6 +66,17 @@ export default async function handler(
           .json({ status: "ERROR", message: "Unauthorized" });
       }
 
+      if (!mongoose.Types.ObjectId.isValid(data.user))
+        return res
+          .status(400)
+          .json({ status: "ERROR", message: "Invalid Member!" });
+
+      const userExists = await User.exists({ _id: data.user });
+      if (!userExists)
+        return res
+          .status(400)
+          .json({ status: "ERROR", message: "Invalid Member!" });
+
       await Club.updateOne(
         { _id: id, "members.user": { $ne: data.user } },
         { $push: { members: data } }
@@ -84,6 +96,7 @@ export default async function handler(
     //   return res.status(401).json({ status: "ERROR", message: "Unauthorized" });
     // }
   } catch (error) {
+    console.log(error);
     return res.status(400).json({ status: "ERROR", error });
   }
 }

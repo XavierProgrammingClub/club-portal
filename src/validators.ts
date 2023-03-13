@@ -36,6 +36,20 @@ export const newMemberSchema = z.object({
   }),
 });
 
+export const updateMemberSchema = z.object({
+  role: z.string().min(3),
+  rank: z.number().optional(),
+  showcase: z.boolean(),
+  permissions: z.object({
+    canAddMembers: z.boolean(),
+    canPublishAnnouncements: z.boolean(),
+    canRemoveMembers: z.boolean(),
+    canPublishBlogs: z.boolean(),
+    canManageClubSettings: z.boolean(),
+    canManagePermissions: z.boolean(),
+  }),
+});
+
 export const newClubSchema = z.object({
   name: z.string(),
   description: z.string(),
@@ -67,3 +81,4 @@ export type AdminUpdateClubCredentialsDTO = z.infer<
   typeof adminUpdateClubSchema
 >;
 export type NewMemberCredentialsDTO = z.infer<typeof newMemberSchema>;
+export type UpdateMemberCredentialsDTO = z.infer<typeof updateMemberSchema>;

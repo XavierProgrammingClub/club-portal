@@ -17,6 +17,7 @@ import {
   Autocomplete,
   Loader,
   Switch,
+  Badge,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -29,13 +30,18 @@ import React, { forwardRef, useRef, useState } from "react";
 import { ClubDashboardLayout } from "@/components/ClubDashboardLayout";
 import { DashboardBreadCrumb } from "@/components/DashboardBreadCrumb";
 import { clubMembersRole, defaultPermissions } from "@/constants";
-import { useSingleClub } from "@/hooks/useClub";
+import { useClubs, useSingleClub } from "@/hooks/useClub";
 import { useUserClubDetails } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
 import { IClub } from "@/models/club";
 import { IUser } from "@/models/user";
 import { queryClient } from "@/pages/_app";
-import { NewMemberCredentialsDTO, newMemberSchema } from "@/validators";
+import {
+  NewMemberCredentialsDTO,
+  newMemberSchema,
+  UpdateMemberCredentialsDTO,
+  updateMemberSchema,
+} from "@/validators";
 
 const getUsers = async (
   searchQuery: string
@@ -45,7 +51,6 @@ const getUsers = async (
 
 const AdminSingleClub = () => {
   const router = useRouter();
-
   const { id } = router.query;
 
   const { data } = useSingleClub({
@@ -54,8 +59,6 @@ const AdminSingleClub = () => {
   const { isUserInClub, isSuperUser } = useUserClubDetails();
   const [drawerOpened, { open: handleOpenDrawer, close: handleCloseDrawer }] =
     useDisclosure(false);
-
-  if (!isUserInClub) return;
 
   const breadcrumbItems = [
     {
@@ -103,7 +106,7 @@ const AdminSingleClub = () => {
               size="md"
             />
           </form>
-          {isSuperUser || isUserInClub.permissions.canAddMembers ? (
+          {isSuperUser || isUserInClub?.permissions.canAddMembers ? (
             <Button onClick={handleOpenDrawer} size="md">
               Add members
             </Button>
@@ -121,11 +124,11 @@ const AdminSingleClub = () => {
   );
 };
 
-interface AddMemberDrawerProps {
+interface MemberDrawerProps {
   opened: boolean;
   onClose: () => void;
 }
-const AddMemberDrawer = (props: AddMemberDrawerProps) => {
+const AddMemberDrawer = (props: MemberDrawerProps) => {
   const router = useRouter();
 
   const { id } = router.query;
@@ -151,6 +154,7 @@ const AddMemberDrawer = (props: AddMemberDrawerProps) => {
 
   const handleAddMember = async (data: NewMemberCredentialsDTO) => {
     await axios.post(`/api/clubs/${id}/members/`, data);
+    form.reset();
     props.onClose();
     await queryClient.refetchQueries(["club", id]);
   };
@@ -282,6 +286,132 @@ const AddMemberDrawer = (props: AddMemberDrawerProps) => {
   );
 };
 
+const EditMemberDrawer = (props: MemberDrawerProps & { memberId: string }) => {
+  const router = useRouter();
+
+  const { id } = router.query;
+
+  const form = useForm<UpdateMemberCredentialsDTO>({
+    validateInputOnBlur: true,
+    validate: zodResolver(updateMemberSchema),
+    initialValues: {
+      permissions: clubMembersRole.find(
+        (role) => role.title === "Active Member"
+      )?.permissions as IClub["members"][0]["permissions"],
+      role: "",
+      showcase: true,
+    },
+  });
+
+  const { data: clubsData } = useSingleClub({
+    id: id as string,
+    onSuccess: (data) => {
+      const user = data.club.members.find(
+        (member) => member._id === props.memberId
+      );
+      if (!user) return props.onClose();
+
+      form.setValues(user);
+    },
+  });
+
+  const handleUpdateMember = async (data: UpdateMemberCredentialsDTO) => {
+    await axios.patch(`/api/clubs/${id}/members/${props.memberId}`, data);
+    form.reset();
+    props.onClose();
+    await queryClient.refetchQueries(["club", id]);
+  };
+
+  const handleRoleSelectChange = (val: string) => {
+    form.setFieldValue("role", val);
+    const userPermission = clubMembersRole.find((role) => role.title === val);
+    if (!userPermission) {
+      return form.setFieldValue("permissions", defaultPermissions);
+    }
+
+    form.setFieldValue("permissions", userPermission.permissions);
+  };
+
+  return (
+    <Drawer opened={props.opened} onClose={props.onClose} title="Update Member">
+      <form onSubmit={form.onSubmit(handleUpdateMember)}>
+        <Autocomplete
+          label="Role"
+          placeholder="Member"
+          mt={"md"}
+          limit={20}
+          value={form.values.role}
+          error={form.errors.role}
+          onChange={handleRoleSelectChange}
+          data={[
+            { value: "President", label: "President" },
+            { value: "Vice President", label: "Vice President" },
+            { value: "Secretary", label: "Secretary" },
+            { value: "Treasurer", label: "Treasurer" },
+            { value: "Active Member", label: "Active Member" },
+            { value: "General Member", label: "General Member" },
+          ]}
+        />
+
+        <Switch
+          label="Showcase member on club's page"
+          mt="md"
+          checked={form.values.showcase}
+          {...form.getInputProps("showcase")}
+        />
+
+        <Text fw={500} fz="sm" mt="lg">
+          Permissions
+        </Text>
+        <Text c="dimmed" fz="xs">
+          Choose the permissions that you want to allow to this user!
+        </Text>
+
+        <Switch
+          label="Can add members"
+          mt="sm"
+          checked={form.values.permissions.canAddMembers}
+          {...form.getInputProps("permissions.canAddMembers")}
+        />
+        <Switch
+          label="Can remove members"
+          mt="sm"
+          checked={form.values.permissions.canRemoveMembers}
+          {...form.getInputProps("permissions.canRemoveMembers")}
+        />
+        <Switch
+          label="Can publish announcements"
+          mt="sm"
+          checked={form.values.permissions.canPublishAnnouncements}
+          {...form.getInputProps("permissions.canPublishAnnouncements")}
+        />
+        <Switch
+          label="Can publish blogs"
+          mt="sm"
+          checked={form.values.permissions.canPublishBlogs}
+          {...form.getInputProps("permissions.canPublishBlogs")}
+        />
+        <Switch
+          label="Can manage club settings"
+          mt="sm"
+          checked={form.values.permissions.canManageClubSettings}
+          {...form.getInputProps("permissions.canManageClubSettings")}
+        />
+        <Switch
+          label="Can manage permissions"
+          mt="sm"
+          checked={form.values.permissions.canManagePermissions}
+          {...form.getInputProps("permissions.canManagePermissions")}
+        />
+
+        <Button type="submit" mt="xl">
+          Update Member
+        </Button>
+      </form>
+    </Drawer>
+  );
+};
+
 // eslint-disable-next-line react/display-name
 const MembersAutoCompleteItem = forwardRef<
   HTMLDivElement,
@@ -323,6 +453,8 @@ export function ClubMembersTable({
   onDeleteMember,
 }: ClubMembersTableProps) {
   const { isUserInClub, isSuperUser } = useUserClubDetails();
+  const [drawerOpened, { open: handleOpenDrawer, close: handleCloseDrawer }] =
+    useDisclosure(false);
 
   const rows = data.map((item) => (
     <tr key={item._id}>
@@ -351,10 +483,23 @@ export function ClubMembersTable({
       </td>
 
       <td>
+        <Badge color="blue">{item.role}</Badge>
+      </td>
+
+      <td>
         <Group>
-          <ActionIcon variant="outline" color="blue">
-            <IconEdit size={18} />
-          </ActionIcon>
+          {isSuperUser || isUserInClub?.role === "President" ? (
+            <ActionIcon variant="outline" color="blue">
+              <IconEdit size={18} onClick={handleOpenDrawer} />
+
+              <EditMemberDrawer
+                opened={drawerOpened}
+                onClose={handleCloseDrawer}
+                memberId={item._id}
+              />
+            </ActionIcon>
+          ) : null}
+
           {isSuperUser || isUserInClub?.permissions.canRemoveMembers ? (
             <ActionIcon
               variant="outline"
@@ -375,6 +520,7 @@ export function ClubMembersTable({
         <thead>
           <tr>
             <th>Name</th>
+            <th>Role</th>
             <th>Action</th>
           </tr>
         </thead>

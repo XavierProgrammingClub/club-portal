@@ -11,7 +11,6 @@ export default async function handler(
 ) {
   const { id: clubId } = req.query;
   const { userId } = req.query;
-  console.log(req.query);
 
   await connectDatabase().catch(() =>
     res.json({ status: "ERROR", message: "Internal Server Error" })
@@ -117,7 +116,7 @@ export default async function handler(
       // const { data } = parsed;
 
       await Club.updateOne(
-        { _id: clubId, "members.user": userId },
+        { _id: clubId, "members._id": userId },
         {
           $set: {
             "members.$": req.body,
