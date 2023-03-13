@@ -190,7 +190,11 @@ export const User = () => {
   const renderUserDetails = () => {
     return (
       <>
-        <Avatar src={null} color="red" radius="xl" />
+        <Avatar
+          src={`https://res.cloudinary.com/dmixkq1uo/image/upload/w_120/${data?.user.profilePic}`}
+          color="red"
+          radius="xl"
+        />
         <Box sx={{ flex: 1 }}>
           <Text size="sm" weight={500}>
             {data?.user.name}
