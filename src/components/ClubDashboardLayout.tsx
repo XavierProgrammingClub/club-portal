@@ -14,8 +14,8 @@ import {
   Text,
   Box,
   Menu,
-  ColorScheme,
   ThemeIcon,
+  LoadingOverlay,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import {
@@ -36,7 +36,7 @@ import { CldImage } from "next-cloudinary";
 import React, { ReactNode, useState } from "react";
 
 import { useSingleClub } from "@/hooks/useClub";
-import { useUser } from "@/hooks/useUser";
+import { useUser, useUserClubDetails } from "@/hooks/useUser";
 import { queryClient } from "@/pages/_app";
 
 export const ClubDashboardLayout = ({ children }: { children: ReactNode }) => {
@@ -46,26 +46,18 @@ export const ClubDashboardLayout = ({ children }: { children: ReactNode }) => {
 
   const { data, isLoading: isClubLoading } = useSingleClub({
     id: id as string,
-    enabled: router.isReady,
   });
   const { data: userData, isLoading: isUserLoading } = useUser();
+  const { isUserInClub, isSuperUser } = useUserClubDetails();
 
   const { classes } = useStyles();
   const [opened, setOpened] = useState(false);
 
-  if (isUserLoading) return <>Loading</>;
-  if (!userData) {
-    router.push("/");
-    return null;
-  }
+  if (isUserLoading || isClubLoading)
+    return <LoadingOverlay visible={true} overlayBlur={2} />;
 
-  const isSuperUser = userData?.user.role === "superuser";
-  const isUserInClub = data?.club.members.find(
-    (member) => member.user._id === userData.user._id
-  );
-
-  if (!(isSuperUser || isUserInClub)) {
-    router.push("/");
+  if (!(isSuperUser || isUserInClub) || !data || !userData) {
+    router.push("/").catch();
     return null;
   }
 
@@ -86,11 +78,11 @@ export const ClubDashboardLayout = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const Logo = ({ colorScheme }: { colorScheme: ColorScheme }) => {
+export const Logo = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const { data } = useSingleClub({ id: id as string, enabled: router.isReady });
+  const { data } = useSingleClub({ id: id as string });
 
   if (data) {
     return (
@@ -111,27 +103,33 @@ export const data = [
     icon: <IconHome size={16} />,
     color: "blue",
     label: "Home",
-    to: "",
+    href: "",
   },
   {
     icon: <IconUsers size={16} />,
     color: "teal",
     label: "Members",
-    to: "members",
-  },
-  {
-    icon: <IconSettings size={16} />,
-    color: "yellow",
-    label: "Settings",
-    to: "settings",
+    href: "members",
   },
 ];
 
 export const MainLinks = () => {
-  const links = data.map((link) => (
-    <MainLink {...link} key={link.label} href={link.to} />
-  ));
-  return <>{links}</>;
+  const { isSuperUser, isUserInClub } = useUserClubDetails();
+  const links = data.map((link) => <MainLink {...link} key={link.label} />);
+
+  return (
+    <>
+      {links}
+      {isSuperUser || isUserInClub?.permissions.canManageClubSettings ? (
+        <MainLink
+          href="settings"
+          color="yellow"
+          label="Settings"
+          icon={<IconSettings size={16} />}
+        />
+      ) : null}
+    </>
+  );
 };
 
 interface MainLinkProps {
@@ -174,9 +172,7 @@ export const User = () => {
   const { classes } = useStyles();
 
   const router = useRouter();
-  const { data, isLoading } = useUser();
-
-  const { id } = router.query;
+  const { data } = useUser();
 
   const onLogout = async () => {
     await signOut({ redirect: false });
@@ -283,7 +279,7 @@ export const AppHeader = (props: AppHeaderProps) => {
             mr="xl"
           />
         </MediaQuery>
-        <Logo colorScheme={colorScheme} />
+        <Logo />
         <ActionIcon
           variant="default"
           onClick={() => toggleColorScheme()}

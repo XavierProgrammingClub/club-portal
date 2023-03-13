@@ -1,4 +1,3 @@
-// import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Container,
   Grid,
@@ -7,13 +6,14 @@ import {
   Avatar,
   Button,
   TextInput,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { showNotification } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { IconCheck } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import { CldUploadButton } from "next-cloudinary";
-// import { useForm } from "react-hook-form";
+import React from "react";
 
 import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
@@ -35,12 +35,11 @@ const ProfileEdit = () => {
     onSuccess: (data) => {
       form.setValues(data.user);
     },
-    enabled: router.isReady,
   });
 
-  if (isLoading) return null;
+  if (isLoading) return <LoadingOverlay visible={true} overlayBlur={2} />;
   if (!data) {
-    router.push("/");
+    router.push("/").catch(console.log);
     return;
   }
 
@@ -51,22 +50,13 @@ const ProfileEdit = () => {
   };
 
   const handleUpdateUser = async (data: UpdateUserCredentialsDTO) => {
-    try {
-      await axios.patch(`/api/users/info`, data);
+    await axios.patch(`/api/users/info`, data);
 
-      showNotification({
-        icon: <IconCheck size={16} />,
-        color: "teal",
-        message: "Profile updated successfully!",
-      });
-    } catch (error: any) {
-      showNotification({
-        title: "Error Occurred while updating profile!",
-        message: error.message,
-        icon: <IconX size={16} />,
-        color: "red",
-      });
-    }
+    showNotification({
+      icon: <IconCheck size={16} />,
+      color: "teal",
+      message: "Profile updated successfully!",
+    });
 
     await queryClient.refetchQueries(["current-user"]);
     await router.push(`/profile`);
@@ -74,7 +64,7 @@ const ProfileEdit = () => {
 
   return (
     <>
-      <Container>
+      <Container size="xl">
         <Grid>
           <Col md={4} sm={12}>
             <UserInfoAction

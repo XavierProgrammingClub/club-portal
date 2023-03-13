@@ -23,7 +23,7 @@ export const adminUpdateUserSchema = updateUserSchema.merge(z.object({}));
 
 export const newMemberSchema = z.object({
   user: z.string(),
-  role: z.string(),
+  role: z.string().min(3),
   rank: z.number().optional(),
   showcase: z.boolean(),
   permissions: z.object({

@@ -10,9 +10,11 @@ import {
   Text,
   ScrollArea,
   Title,
+  LoadingOverlay,
 } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import React from "react";
 
 import { useUserClubs } from "@/hooks/useClub";
 import { useUser } from "@/hooks/useUser";
@@ -23,7 +25,8 @@ const Index = () => {
   const { data: clubsData, isLoading: isClubLoading } = useUserClubs();
   const router = useRouter();
 
-  if (isUserLoading || isClubLoading) return null;
+  if (isUserLoading || isClubLoading)
+    return <LoadingOverlay visible={true} overlayBlur={2} />;
   if (!userData || !clubsData) {
     router.push("/");
     return;
@@ -31,7 +34,7 @@ const Index = () => {
 
   return (
     <>
-      <Container>
+      <Container size="xl">
         <Grid>
           <Col md={4} sm={12}>
             <UserInfoAction
@@ -48,10 +51,14 @@ const Index = () => {
             />
           </Col>
           <Col md={8} sm={12}>
-            <Title sx={{ paddingBottom: ".5rem" }} order={2}>
+            <Title sx={{ paddingBottom: "1rem" }} order={2}>
               Clubs
             </Title>
-            <UsersRolesTable data={clubsData.clubs} />
+            {clubsData.clubs.length > 0 ? (
+              <UserClubsTable data={clubsData.clubs} />
+            ) : (
+              <Text>No Clubs found</Text>
+            )}
           </Col>
         </Grid>
       </Container>
@@ -141,11 +148,11 @@ export const UserInfoAction = ({
   </Paper>
 );
 
-interface UsersTableProps {
+interface UsersClubTablesProps {
   data: IClub[];
 }
 
-export function UsersRolesTable({ data }: UsersTableProps) {
+export function UserClubsTable({ data }: UsersClubTablesProps) {
   const rows = data.map((item) => (
     <tr key={item.name}>
       <td>

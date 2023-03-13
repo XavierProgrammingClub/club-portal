@@ -8,8 +8,10 @@ specifiers:
   '@mantine/core': ^6.0.1
   '@mantine/form': ^6.0.1
   '@mantine/hooks': ^6.0.1
+  '@mantine/modals': ^6.0.1
   '@mantine/next': ^6.0.1
   '@mantine/notifications': ^6.0.1
+  '@mantine/nprogress': ^6.0.1
   '@tabler/icons-react': ^2.10.0
   '@tanstack/react-query': ^4.24.10
   '@types/bcryptjs': ^2.4.2
@@ -57,8 +59,10 @@ dependencies:
   '@mantine/core': 6.0.1_7atxah5aiy65tdrz25o24k4n44
   '@mantine/form': 6.0.1_react@18.2.0
   '@mantine/hooks': 6.0.1_react@18.2.0
+  '@mantine/modals': 6.0.1_hdfbaha3esn2nmwxggs2gvheiu
   '@mantine/next': 6.0.1_pgglsq75fvw45j476lnzqmxl6q
   '@mantine/notifications': 6.0.1_hdfbaha3esn2nmwxggs2gvheiu
+  '@mantine/nprogress': 6.0.1_hdfbaha3esn2nmwxggs2gvheiu
   '@tabler/icons-react': 2.10.0_react@18.2.0
   '@tanstack/react-query': 4.24.10_biqbaboplfbrettd7655fr4n2y
   '@types/node': 18.14.1
@@ -1355,6 +1359,21 @@ packages:
       react: 18.2.0
     dev: false
 
+  /@mantine/modals/6.0.1_hdfbaha3esn2nmwxggs2gvheiu:
+    resolution: {integrity: sha512-uMtGDI3sPygQV5VOLIuNa8Y7gmylZN82BAWy8KoCduVn5Fbby/t6ILz7OVJEp8Ob+IL9CZZYvQRtnHQ0zLjq8g==}
+    peerDependencies:
+      '@mantine/core': 6.0.1
+      '@mantine/hooks': 6.0.1
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    dependencies:
+      '@mantine/core': 6.0.1_7atxah5aiy65tdrz25o24k4n44
+      '@mantine/hooks': 6.0.1_react@18.2.0
+      '@mantine/utils': 6.0.1_react@18.2.0
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
   /@mantine/next/6.0.1_pgglsq75fvw45j476lnzqmxl6q:
     resolution: {integrity: sha512-+7Mb79V+ah/XhVmOTQ6tlg0ZHZhweTgryQO9u87wD8KMxuuNhdNLZq27E8390PTXHhxFO93T7k4WbQqIXQOkUg==}
     peerDependencies:
@@ -1386,6 +1405,21 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-transition-group: 4.4.2_biqbaboplfbrettd7655fr4n2y
+    dev: false
+
+  /@mantine/nprogress/6.0.1_hdfbaha3esn2nmwxggs2gvheiu:
+    resolution: {integrity: sha512-LXFVxhLEpZwB8uUWAeenxbtCyeU8ZgWAmMLJjXgHQ9I/flkxrDmNXAbcNzvNjjFXANZRIl2h3Heb6ZXYOEbZyw==}
+    peerDependencies:
+      '@mantine/core': 6.0.1
+      '@mantine/hooks': 6.0.1
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    dependencies:
+      '@mantine/core': 6.0.1_7atxah5aiy65tdrz25o24k4n44
+      '@mantine/hooks': 6.0.1_react@18.2.0
+      '@mantine/utils': 6.0.1_react@18.2.0
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /@mantine/ssr/6.0.1_5hf7yutiboqvmzmnlvms67nwwa:

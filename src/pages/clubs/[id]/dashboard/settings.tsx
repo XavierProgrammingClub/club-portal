@@ -1,129 +1,145 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Avatar,
+  Button,
+  Container,
+  Switch,
+  Textarea,
+  TextInput,
+  Title,
+} from "@mantine/core";
+import { useForm, zodResolver } from "@mantine/form";
 import { useRouter } from "next/router";
-import { CldImage, CldUploadButton } from "next-cloudinary";
-import { useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { CldUploadButton } from "next-cloudinary";
+import React from "react";
 
 import { ClubDashboardLayout } from "@/components/ClubDashboardLayout";
-import { ClubDashboardNavbar } from "@/components/ClubDashboardNavbar";
+import { DashboardBreadCrumb } from "@/components/DashboardBreadCrumb";
 import { useSingleClub } from "@/hooks/useClub";
-import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
 import { queryClient } from "@/pages/_app";
 import { CloudinaryImage } from "@/types/cloudinary";
-import {
-  AdminUpdateClubCredentialsDTO,
-  adminUpdateClubSchema,
-} from "@/validators";
+import { updateClubSchema, UpdateClubCredentialsDTO } from "@/validators";
 
 const ClubSettings = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const { data: userData, isLoading: isUserLoading } = useUser();
-
-  const { data, isLoading: isClubLoading } = useSingleClub({
+  const { data } = useSingleClub({
     id: id as string,
     onSuccess: (data) => {
-      reset(data.club);
+      form.setValues(data.club);
     },
-    enabled: router.isReady,
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    getValues,
-    setValue,
-    reset,
-  } = useForm<AdminUpdateClubCredentialsDTO>({
-    resolver: zodResolver(adminUpdateClubSchema),
-    reValidateMode: "onBlur",
-    mode: "all",
+  const form = useForm<UpdateClubCredentialsDTO>({
+    validateInputOnBlur: true,
+    initialValues: {
+      profilePic: "",
+      name: "",
+      // banner: "",
+      isAvailableForRegistration: true,
+      description: "",
+    },
+    validate: zodResolver(updateClubSchema),
   });
 
-  const currentUserPermissions = useMemo(
-    () =>
-      data?.club.members.find((d) => d.user._id === userData?.user._id)
-        ?.permissions,
-    [data]
-  );
+  const breadcrumbItems = [
+    {
+      href: `/clubs/${id}/dashboard`,
+      title: data ? `${data?.club.name}'s Home` : "Home",
+    },
+    { href: `/clubs/${id}/dashboard/settings`, title: "Settings" },
+  ];
 
-  if (isUserLoading || isClubLoading) {
-    return;
-  }
-
-  const isSuperUser = userData?.user.role === "superuser";
-  if (!isSuperUser && !currentUserPermissions?.canManageClubSettings) {
-    router.push(`/clubs/${id}/dashboard`).then(() => {
-      return null;
-    });
-  }
-
-  const handleUpdateClub = async (data: AdminUpdateClubCredentialsDTO) => {
+  const handleUpdateClub = async (data: UpdateClubCredentialsDTO) => {
     await axios.patch(`/api/clubs/${id}`, data);
 
     await queryClient.refetchQueries(["all-clubs", "club", id]);
-    await router.push(`/admin/clubs/${id}`);
+    await router.push(`/clubs/${id}/dashboard`);
   };
 
   const handleOnUpload = (a: CloudinaryImage) => {
     if (!(a.event === "success")) return;
 
-    setValue("profilePic", a.info.public_id);
+    form.setFieldValue("profilePic", a.info.public_id);
   };
-
-  const values = getValues();
 
   return (
     <ClubDashboardLayout>
-      <ClubDashboardNavbar />
+      <Container size="xl">
+        <DashboardBreadCrumb items={breadcrumbItems} />
+        <Title sx={{ paddingBottom: "2rem" }} order={1} mt="sm">
+          Edit Club Settings
+        </Title>
 
-      {values.profilePic ? (
-        <CldImage
-          width="50"
-          height="50"
-          src={values.profilePic}
-          alt="Description of my image"
+        <Avatar
+          size={100}
+          src={`https://res.cloudinary.com/dmixkq1uo/image/upload/w_120/${form.values.profilePic}`}
+          radius={100}
+          sx={{ objectFit: "cover" }}
         />
-      ) : null}
 
-      <CldUploadButton
-        options={{
-          multiple: false,
-          resourceType: "image",
-          maxFileSize: 5242880,
-        }}
-        onUpload={handleOnUpload}
-        uploadPreset="fs1xhftk"
-      ></CldUploadButton>
+        <CldUploadButton
+          options={{
+            multiple: false,
+            resourceType: "image",
+            maxFileSize: 5242880,
+          }}
+          onUpload={handleOnUpload}
+          uploadPreset="fs1xhftk"
+          {...{
+            id: "uploadBtn",
+            style: {
+              visibility: "hidden",
+              border: 0,
+              padding: 0,
+              width: 0,
+            },
+          }}
+        />
 
-      <form onSubmit={handleSubmit(handleUpdateClub)}>
-        <div>
-          <input type="text" placeholder="Name" {...register("name")} />
-        </div>
+        <Button
+          onClick={() => {
+            document.getElementById("uploadBtn")?.click();
+          }}
+          variant="default"
+          size="sm"
+          sx={{ marginTop: "0.5rem" }}
+        >
+          Update Avatar
+        </Button>
 
-        <div>
-          <textarea
-            {...register("description")}
-            placeholder="Description"
-          ></textarea>
-        </div>
-
-        <div>
-          <label htmlFor="isAvailableForRegistration">
-            isAvailableForRegistration
-          </label>
-          <input
-            type="checkbox"
-            id="isAvailableForRegistration"
-            {...register("isAvailableForRegistration")}
+        <form onSubmit={form.onSubmit(handleUpdateClub)}>
+          <TextInput
+            sx={{ marginTop: "1rem" }}
+            label="Name"
+            {...form.getInputProps("name")}
+            withAsterisk
+            error={form.errors.name}
           />
-        </div>
 
-        <button disabled={isSubmitting}>Update</button>
-      </form>
+          <Textarea
+            sx={{ marginTop: "1rem" }}
+            label="Description"
+            {...form.getInputProps("description")}
+            withAsterisk
+            autosize
+            minRows={3}
+            error={form.errors.description}
+          />
+
+          <Switch
+            sx={{ marginTop: "1rem" }}
+            label="Our club accepts new members registration!"
+            checked={form.values.isAvailableForRegistration}
+            {...form.getInputProps("isAvailableForRegistration")}
+          />
+
+          <Button type="submit" sx={{ marginTop: "2rem" }}>
+            Update Settings
+          </Button>
+        </form>
+      </Container>
     </ClubDashboardLayout>
   );
 };

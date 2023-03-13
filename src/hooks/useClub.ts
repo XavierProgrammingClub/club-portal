@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/router";
 
 import { axios } from "@/lib/axios";
 import { IClub } from "@/models/club";
@@ -20,21 +21,22 @@ const getSingleClub = async (
   status: "OK" | "ERROR";
   club: IClub;
 }> => {
-  return axios.get(`/api/clubs/${id}`);
+  return await axios.get(`/api/clubs/${id}`);
 };
 
 export const useSingleClub = ({
   id,
   onSuccess,
-  enabled,
 }: {
   id: string;
   onSuccess?: (club: Awaited<ReturnType<typeof getSingleClub>>) => void;
   enabled?: boolean;
 }) => {
+  const router = useRouter();
+
   return useQuery(["club", id], () => getSingleClub(id), {
     onSuccess,
-    enabled,
+    enabled: router.isReady,
   });
 };
 

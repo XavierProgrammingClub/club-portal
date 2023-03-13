@@ -50,7 +50,6 @@ const AdminSingleClub = () => {
 
   const { data, isLoading, isError } = useSingleClub({
     id: id as string,
-    enabled: router.isReady,
   });
 
   const {

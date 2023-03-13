@@ -71,7 +71,7 @@ export const clubMembersRole = [
       canManagePermissions: false,
     },
   },
-];
+] as const;
 
 export const defaultPermissions = {
   canAddMembers: false,

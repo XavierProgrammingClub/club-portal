@@ -22,10 +22,8 @@ const AdminSingleUser = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const { data, isLoading, isError } = useQuery(
-    ["user", id],
-    () => getUser(id as string),
-    { enabled: router.isReady }
+  const { data, isLoading, isError } = useQuery(["user", id], () =>
+    getUser(id as string)
   );
 
   if (!userData?.user || !(userData?.user.role === "superuser")) return;

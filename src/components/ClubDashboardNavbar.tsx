@@ -12,7 +12,6 @@ export const ClubDashboardNavbar = () => {
   const { data: userData, isLoading: isUserLoading } = useUser();
   const { data, isLoading: isClubLoading } = useSingleClub({
     id: id as string,
-    enabled: router.isReady,
   });
 
   const currentClubUser = useMemo(

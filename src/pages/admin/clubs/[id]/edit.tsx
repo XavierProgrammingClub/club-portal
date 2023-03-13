@@ -38,7 +38,6 @@ const AdmingSingleClubEdit = () => {
     onSuccess: (data) => {
       reset(data.club);
     },
-    enabled: router.isReady,
   });
 
   if (!userData?.user || !(userData?.user.role === "superuser")) return;
