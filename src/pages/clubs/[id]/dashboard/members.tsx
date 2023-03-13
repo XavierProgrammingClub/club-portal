@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import Select, { SingleValue } from "react-select";
 import AsyncSelect from "react-select/async";
 
+import { ClubDashboardLayout } from "@/components/ClubDashboardLayout";
 import { ClubDashboardNavbar } from "@/components/ClubDashboardNavbar";
 import { clubMembersRole, defaultPermissions } from "@/constants";
 import { useSingleClub } from "@/hooks/useClub";
@@ -109,7 +110,7 @@ const AdminSingleClub = () => {
   };
 
   return (
-    <>
+    <ClubDashboardLayout>
       <ClubDashboardNavbar />
 
       {isSuperUser || currentUserPermissions.canAddMembers ? (
@@ -259,7 +260,7 @@ const AdminSingleClub = () => {
           </li>
         ))}
       </ul>
-    </>
+    </ClubDashboardLayout>
   );
 };
 

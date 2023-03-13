@@ -8,6 +8,7 @@ const server = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]),
   MONGODB_URI: z.string(),
   JWT_SECRET: z.string(),
+  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string(),
 });
 
 /**
@@ -30,6 +31,8 @@ const processEnv: Record<
   NODE_ENV: process.env.NODE_ENV,
   JWT_SECRET: process.env.JWT_SECRET,
   MONGODB_URI: process.env.MONGODB_URI,
+  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:
+    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
 };
 
 // Don't touch the part below

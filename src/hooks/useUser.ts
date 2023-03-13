@@ -8,7 +8,6 @@ const getUser = async (): Promise<{ status: "OK" | "ERROR"; user: IUser }> => {
     status: "OK" | "ERROR";
     user: IUser;
   };
-  console.log("DATA", data);
   return data;
 };
 

@@ -4,6 +4,7 @@ import { CldImage, CldUploadButton } from "next-cloudinary";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
+import { ClubDashboardLayout } from "@/components/ClubDashboardLayout";
 import { ClubDashboardNavbar } from "@/components/ClubDashboardNavbar";
 import { useSingleClub } from "@/hooks/useClub";
 import { useUser } from "@/hooks/useUser";
@@ -76,7 +77,7 @@ const ClubSettings = () => {
   const values = getValues();
 
   return (
-    <>
+    <ClubDashboardLayout>
       <ClubDashboardNavbar />
 
       {values.profilePic ? (
@@ -123,7 +124,7 @@ const ClubSettings = () => {
 
         <button disabled={isSubmitting}>Update</button>
       </form>
-    </>
+    </ClubDashboardLayout>
   );
 };
 
