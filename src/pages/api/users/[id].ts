@@ -15,15 +15,10 @@ export default async function handler(
   );
 
   try {
-    const user = await getCurrentUserDetails({ req, res });
-    if (!user || !(user.role === "superuser")) {
-      return res.status(401).json({ status: "ERROR", message: "Unauthorized" });
-    }
-
     /*
-      @GET /api/users/:id
-      @desc Get a user details
-    */
+   @GET /api/users/:id
+   @desc Get a user details
+ */
     if (req.method === "GET") {
       const user = await User.findById(id).select("-password");
 
@@ -33,6 +28,11 @@ export default async function handler(
           .json({ status: "ERROR", message: "User not found!" });
 
       return res.json({ status: "OK", user });
+    }
+
+    const user = await getCurrentUserDetails({ req, res });
+    if (!user || !(user.role === "superuser")) {
+      return res.status(401).json({ status: "ERROR", message: "Unauthorized" });
     }
 
     /*

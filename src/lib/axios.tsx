@@ -10,7 +10,11 @@ axios.interceptors.response.use(
     const responseData = error.response?.data;
     const message = responseData?.message || error.message;
 
-    if (message === "User not logged in!") return Promise.reject(error);
+    if (
+      message === "User not logged in!" ||
+      message === "Request failed with status code 400"
+    )
+      return Promise.reject(error);
 
     if (responseData?.message === "Validation error") {
       responseData?.issues.forEach(

@@ -18,6 +18,8 @@ import {
   Loader,
   Switch,
   Badge,
+  Popover,
+  PasswordInput,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -25,13 +27,14 @@ import { openConfirmModal } from "@mantine/modals";
 import { IconEdit, IconSearch, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import React, { forwardRef, useMemo, useRef, useState } from "react";
 
 import { ClubDashboardLayout } from "@/components/ClubDashboardLayout";
 import { DashboardBreadCrumb } from "@/components/DashboardBreadCrumb";
 import { clubMembersRole, defaultPermissions } from "@/constants";
-import { useClubs, useSingleClub } from "@/hooks/useClub";
-import { useUserClubDetails } from "@/hooks/useUser";
+import { useSingleClub } from "@/hooks/useClub";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useSingleUser, useUserClubDetails } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
 import { IClub } from "@/models/club";
 import { IUser } from "@/models/user";
@@ -39,6 +42,8 @@ import { queryClient } from "@/pages/_app";
 import {
   NewMemberCredentialsDTO,
   newMemberSchema,
+  NewUserCredentialsDTO,
+  newUserSchema,
   UpdateMemberCredentialsDTO,
   updateMemberSchema,
 } from "@/validators";
@@ -124,6 +129,74 @@ const AdminSingleClub = () => {
   );
 };
 
+const AddNewUserPopOver = (props: {
+  onUserCreated: (userId: string) => void;
+}) => {
+  const form = useForm<NewUserCredentialsDTO>({
+    validate: zodResolver(newUserSchema),
+    validateInputOnBlur: true,
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
+
+  const handleNewUser = async (data: NewUserCredentialsDTO) => {
+    const response = (await axios.post("/api/users", data)) as {
+      status: "OK" | "ERROR";
+      user: IUser;
+    };
+    props.onUserCreated(response.user._id);
+  };
+
+  return (
+    <Text size="sm" mt="xs" c="dimmed">
+      Can&apos;t find user?{" "}
+      <Popover width={300} trapFocus position="bottom" withArrow shadow="md">
+        <Popover.Target>
+          <Anchor>Create a new one!</Anchor>
+        </Popover.Target>
+        <Popover.Dropdown
+          sx={(theme) => ({
+            background:
+              theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
+          })}
+        >
+          <form onSubmit={form.onSubmit(handleNewUser)}>
+            <TextInput
+              label="Name"
+              placeholder="Name"
+              size="xs"
+              {...form.getInputProps("name")}
+              error={form.errors.name}
+            />
+            <TextInput
+              label="Email"
+              placeholder="john@doe.com"
+              size="xs"
+              mt="xs"
+              {...form.getInputProps("email")}
+              error={form.errors.email}
+            />
+            <PasswordInput
+              label="Password"
+              placeholder="*********"
+              size="xs"
+              mt="xs"
+              {...form.getInputProps("password")}
+              error={form.errors.password}
+            />
+            <Button type="submit" mt="sm">
+              Create
+            </Button>
+          </form>
+        </Popover.Dropdown>
+      </Popover>
+    </Text>
+  );
+};
+
 interface MemberDrawerProps {
   opened: boolean;
   onClose: () => void;
@@ -150,6 +223,11 @@ const AddMemberDrawer = (props: MemberDrawerProps) => {
       showcase: true,
       user: "",
     },
+  });
+  const debouncedUserId = useDebounce(form.values.user, 500);
+  const { data: userData } = useSingleUser({
+    id: debouncedUserId,
+    enabled: Boolean(form.values.user),
   });
 
   const handleAddMember = async (data: NewMemberCredentialsDTO) => {
@@ -196,19 +274,48 @@ const AddMemberDrawer = (props: MemberDrawerProps) => {
 
   return (
     <Drawer opened={props.opened} onClose={props.onClose} title="Add Member">
-      <form onSubmit={form.onSubmit(handleAddMember)}>
-        <Autocomplete
-          data={data}
-          onChange={handleChange}
-          rightSection={loading ? <Loader size="1rem" /> : null}
-          itemComponent={MembersAutoCompleteItem}
-          filter={() => true}
-          label="Name of user"
-          value={form.values.user}
-          placeholder="John Smith"
-          error={form.errors.user}
-        />
+      {form.values.user && userData?.user ? (
+        <Group spacing="sm">
+          <Avatar
+            size={40}
+            src={`https://res.cloudinary.com/dmixkq1uo/image/upload/w_50/${userData?.user?.profilePic}`}
+            radius={40}
+            sx={{ objectFit: "cover" }}
+          />
+          <div>
+            <Anchor
+              component={Link}
+              href={`/users/${userData?.user?._id}`}
+              fz="sm"
+              fw={500}
+            >
+              {userData?.user?.name}
+            </Anchor>
+            <Text fz="xs" c="dimmed">
+              {userData?.user?.email}
+            </Text>
+          </div>
+        </Group>
+      ) : null}
 
+      <Autocomplete
+        data={data}
+        onChange={handleChange}
+        rightSection={loading ? <Loader size="1rem" /> : null}
+        itemComponent={MembersAutoCompleteItem}
+        filter={() => true}
+        label="Name of user"
+        value={form.values.user}
+        placeholder="John Smith"
+        error={form.errors.user}
+        mt="md"
+      />
+
+      <AddNewUserPopOver
+        onUserCreated={(userId) => form.setFieldValue("user", userId)}
+      />
+
+      <form onSubmit={form.onSubmit(handleAddMember)}>
         <Autocomplete
           label="Role"
           placeholder="Member"
@@ -308,6 +415,8 @@ const EditMemberDrawer = (props: MemberDrawerProps & { memberId: string }) => {
   });
 
   const userData = useMemo(() => {
+    if (!props.opened) return;
+
     const data = clubsData?.club.members.find(
       (member) => member._id === props.memberId
     );
