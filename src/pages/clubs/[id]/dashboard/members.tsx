@@ -25,7 +25,7 @@ import { openConfirmModal } from "@mantine/modals";
 import { IconEdit, IconSearch, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { forwardRef, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 
 import { ClubDashboardLayout } from "@/components/ClubDashboardLayout";
 import { DashboardBreadCrumb } from "@/components/DashboardBreadCrumb";
@@ -305,15 +305,18 @@ const EditMemberDrawer = (props: MemberDrawerProps & { memberId: string }) => {
 
   const { data: clubsData } = useSingleClub({
     id: id as string,
-    onSuccess: (data) => {
-      const user = data.club.members.find(
-        (member) => member._id === props.memberId
-      );
-      if (!user) return props.onClose();
-
-      form.setValues(user);
-    },
   });
+
+  useEffect(() => {
+    if (!clubsData || !props.opened || !props.memberId) return;
+
+    const user = clubsData?.club.members.find(
+      (member) => member._id === props.memberId
+    );
+    if (!user) return props.onClose();
+
+    form.setValues(user);
+  }, [props.opened]);
 
   const handleUpdateMember = async (data: UpdateMemberCredentialsDTO) => {
     await axios.patch(`/api/clubs/${id}/members/${props.memberId}`, data);
@@ -455,6 +458,7 @@ export function ClubMembersTable({
   const { isUserInClub, isSuperUser } = useUserClubDetails();
   const [drawerOpened, { open: handleOpenDrawer, close: handleCloseDrawer }] =
     useDisclosure(false);
+  const [selectedMemberId, setSelectedMemberid] = useState<string>("");
 
   const rows = data.map((item) => (
     <tr key={item._id}>
@@ -489,14 +493,15 @@ export function ClubMembersTable({
       <td>
         <Group>
           {isSuperUser || isUserInClub?.role === "President" ? (
-            <ActionIcon variant="outline" color="blue">
-              <IconEdit size={18} onClick={handleOpenDrawer} />
-
-              <EditMemberDrawer
-                opened={drawerOpened}
-                onClose={handleCloseDrawer}
-                memberId={item._id}
-              />
+            <ActionIcon
+              onClick={() => {
+                setSelectedMemberid(item._id);
+                handleOpenDrawer();
+              }}
+              variant="outline"
+              color="blue"
+            >
+              <IconEdit size={18} />
             </ActionIcon>
           ) : null}
 
@@ -526,6 +531,12 @@ export function ClubMembersTable({
         </thead>
         <tbody>{rows}</tbody>
       </Table>
+
+      <EditMemberDrawer
+        opened={drawerOpened}
+        onClose={handleCloseDrawer}
+        memberId={selectedMemberId}
+      />
     </ScrollArea>
   );
 }
