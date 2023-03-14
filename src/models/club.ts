@@ -27,6 +27,7 @@ export interface IMember {
 export interface IClub {
   _id: string;
   name: string;
+  shortDescription: string;
   description: string;
   profilePic: string;
   banner?: string;
@@ -50,7 +51,7 @@ export interface IAnnouncement {
 
 const announcementSchema = new mongoose.Schema<IAnnouncement>({
   title: { type: String, required: true },
-  description: { type: String, required: true },
+  description: { type: String, default: "" },
   photo: { type: String },
   author: {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -66,7 +67,8 @@ const announcementSchema = new mongoose.Schema<IAnnouncement>({
 const clubSchema = new mongoose.Schema<IClub>(
   {
     name: { type: String, required: true },
-    description: { type: String, required: true },
+    shortDescription: { type: String, required: true, default: "" },
+    description: { type: String, required: true, default: "" },
     profilePic: { type: String, required: true },
     banner: { type: String, required: false },
     members: [

@@ -90,7 +90,7 @@ const ClubDashboard = () => {
               <ClubInfo
                 avatar={data?.club.profilePic}
                 name={data?.club.name}
-                description={data?.club.description}
+                description={data?.club.shortDescription}
               />
             </Col>
             <Col lg={7} md={7} sm={12} ml={{ md: "md" }}>

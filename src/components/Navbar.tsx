@@ -142,39 +142,6 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const mockdata = [
-  {
-    icon: IconCode,
-    title: "Open source",
-    description: "This Pokémon’s cry is very loud and distracting",
-  },
-  {
-    icon: IconCoin,
-    title: "Free for everyone",
-    description: "The fluid of Smeargle’s tail secretions changes",
-  },
-  {
-    icon: IconBook,
-    title: "Documentation",
-    description: "Yanma is capable of seeing 360 degrees without",
-  },
-  {
-    icon: IconFingerprint,
-    title: "Security",
-    description: "The shell’s rounded shape and the grooves on its.",
-  },
-  {
-    icon: IconChartPie3,
-    title: "Analytics",
-    description: "This Pokémon uses its flying ability to quickly chase",
-  },
-  {
-    icon: IconNotification,
-    title: "Notifications",
-    description: "Combusken battles with the intensely hot flames it spews",
-  },
-];
-
 export const Navbar = () => {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
@@ -187,7 +154,12 @@ export const Navbar = () => {
   const { data: clubsData } = useClubs();
 
   const links = clubsData?.clubs.slice(0, 6).map((item) => (
-    <UnstyledButton className={classes.subLink} key={item._id}>
+    <UnstyledButton
+      component={Link}
+      href={`/clubs/${item._id}`}
+      className={classes.subLink}
+      key={item._id}
+    >
       <Group noWrap align="flex-start">
         <Avatar
           radius="xl"
@@ -199,7 +171,7 @@ export const Navbar = () => {
             {item.name}
           </Text>
           <Text lineClamp={2} size="xs" color="dimmed">
-            {item.description}
+            {item.shortDescription}
           </Text>
         </div>
       </Group>
@@ -294,7 +266,6 @@ export const Navbar = () => {
                   >
                     Log in
                   </Button>
-                  <Button>Sign up</Button>
                 </>
               ) : null}
 

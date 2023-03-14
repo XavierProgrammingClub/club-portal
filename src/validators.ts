@@ -54,7 +54,8 @@ export const updateMemberSchema = z.object({
 
 export const newClubSchema = z.object({
   name: z.string(),
-  description: z.string(),
+  shortDescription: z.string().optional(),
+  description: z.string().optional(),
   profilePic: z.string(),
   banner: z.string().optional(),
   members: z.array(newMemberSchema).optional(),
@@ -63,7 +64,8 @@ export const newClubSchema = z.object({
 
 export const updateClubSchema = z.object({
   name: z.string().min(3).max(255).optional(),
-  description: z.string().min(3).max(1024).optional(),
+  shortDescription: z.string().min(3).max(1024).optional(),
+  description: z.string().min(3).max(10000).optional(),
   profilePic: z.string().optional(),
   banner: z.string().optional(),
   isAvailableForRegistration: z.boolean().optional(),

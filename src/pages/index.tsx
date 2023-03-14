@@ -505,7 +505,7 @@ export const ClubsSection = (props: { clubs: IClub[] }) => {
             _id={club._id}
             image={club.profilePic}
             title={club.name}
-            description={club.description}
+            description={club.shortDescription}
           />
         ))}
       </SimpleGrid>
