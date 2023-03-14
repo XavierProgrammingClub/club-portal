@@ -86,12 +86,20 @@ export const Logo = () => {
 
   if (data) {
     return (
-      <CldImage
-        width="30"
-        height="30"
-        src={data.club.profilePic}
-        alt="Description of my image"
-      />
+      <Group>
+        <Link href={`/clubs/${id}/dashboard`}>
+          <CldImage
+            width="30"
+            height="30"
+            src={data.club.profilePic}
+            alt="Description of my image"
+          />
+        </Link>
+
+        <Text component={Link} href={`/clubs/${id}/dashboard`} fw={500}>
+          {data.club.name}
+        </Text>
+      </Group>
     );
   }
 

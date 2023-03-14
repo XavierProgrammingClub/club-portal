@@ -2,6 +2,8 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import { CldImage } from "next-cloudinary";
 
+import { Footer } from "@/components/Footer";
+import { Navbar } from "@/components/Navbar";
 import Club, { IClub } from "@/models/club";
 import { connectDatabase } from "@/utils/db";
 
@@ -10,6 +12,7 @@ const SingleClubPage = (
 ) => {
   return (
     <>
+      <Navbar />
       <ul>
         <li>{props.club._id}</li>
         <li>{props.club.name}</li>
@@ -22,6 +25,7 @@ const SingleClubPage = (
           />
         </li>
       </ul>
+      <Footer />
     </>
   );
 };

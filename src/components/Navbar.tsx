@@ -189,9 +189,6 @@ export const Navbar = () => {
   const links = clubsData?.clubs.slice(0, 6).map((item) => (
     <UnstyledButton className={classes.subLink} key={item._id}>
       <Group noWrap align="flex-start">
-        {/*<ThemeIcon size={34} variant="default" radius="md">*/}
-        {/*  <item.icon size={rem(22)} color={theme.fn.primaryColor()} />*/}
-        {/*</ThemeIcon>*/}
         <Avatar
           radius="xl"
           size={"sm"}
@@ -210,7 +207,7 @@ export const Navbar = () => {
   ));
 
   return (
-    <Box mb={"md"} pos={"sticky"} top={0}>
+    <Box mb={"md"} pos={"sticky"} top={0} sx={{ zIndex: 999 }}>
       <Header height={60} px="md">
         <Container size="xl">
           <Group position="apart" sx={{ height: 60 }}>
