@@ -79,6 +79,8 @@ const ClubDashboard = () => {
     }
   );
 
+  const { isUserInClub, isSuperUser } = useUserClubDetails();
+
   return (
     <>
       <ClubDashboardLayout>
@@ -111,15 +113,17 @@ const ClubDashboard = () => {
           </Grid>
         </Container>
 
-        <Affix position={{ bottom: rem(30), right: rem(30) }}>
-          <Button
-            leftIcon={<IconPlus size="1rem" />}
-            size="md"
-            onClick={handleNewAnnouncementDrawerOpen}
-          >
-            Announce Something
-          </Button>
-        </Affix>
+        {isSuperUser || isUserInClub?.permissions.canPublishAnnouncements ? (
+          <Affix position={{ bottom: rem(30), right: rem(30) }}>
+            <Button
+              leftIcon={<IconPlus size="1rem" />}
+              size="md"
+              onClick={handleNewAnnouncementDrawerOpen}
+            >
+              Announce Something
+            </Button>
+          </Affix>
+        ) : null}
 
         <NewAnnouncementDrawer
           opened={newAnnouncementDrawerOpened}
@@ -220,6 +224,8 @@ const AnnouncementCard = (props: AnnouncementCardProps) => {
     },
   ] = useDisclosure(false);
 
+  const { isUserInClub, isSuperUser } = useUserClubDetails();
+
   const handleDeleteAnnouncement = () => {
     openConfirmModal({
       title: "Delete announcement",
@@ -275,35 +281,37 @@ const AnnouncementCard = (props: AnnouncementCardProps) => {
           </div>
         </Group>
 
-        <Group spacing={0}>
-          <Menu
-            transitionProps={{ transition: "pop" }}
-            withArrow
-            position="bottom-end"
-            withinPortal
-          >
-            <Menu.Target>
-              <ActionIcon>
-                <IconDots size="1rem" stroke={1.5} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                icon={<IconPencil size="1rem" stroke={1.5} />}
-                onClick={handleEditAnnouncementDrawerOpen}
-              >
-                Edit
-              </Menu.Item>
-              <Menu.Item
-                icon={<IconTrash size="1rem" stroke={1.5} />}
-                color="red"
-                onClick={handleDeleteAnnouncement}
-              >
-                Delete Announcement
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Group>
+        {isSuperUser || isUserInClub?.permissions.canPublishAnnouncements ? (
+          <Group spacing={0}>
+            <Menu
+              transitionProps={{ transition: "pop" }}
+              withArrow
+              position="bottom-end"
+              withinPortal
+            >
+              <Menu.Target>
+                <ActionIcon>
+                  <IconDots size="1rem" stroke={1.5} />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  icon={<IconPencil size="1rem" stroke={1.5} />}
+                  onClick={handleEditAnnouncementDrawerOpen}
+                >
+                  Edit
+                </Menu.Item>
+                <Menu.Item
+                  icon={<IconTrash size="1rem" stroke={1.5} />}
+                  color="red"
+                  onClick={handleDeleteAnnouncement}
+                >
+                  Delete Announcement
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </Group>
+        ) : null}
       </Group>
 
       {props.data.photo ? (

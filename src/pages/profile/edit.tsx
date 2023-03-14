@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import { CldUploadButton } from "next-cloudinary";
 import React from "react";
 
+import { Navbar } from "@/components/Navbar";
 import { useUser } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
 import { queryClient } from "@/pages/_app";
@@ -64,9 +65,10 @@ const ProfileEdit = () => {
 
   return (
     <>
+      <Navbar />
       <Container size="xl">
         <Grid>
-          <Col md={4} sm={12}>
+          <Col md={3} sm={12}>
             <UserInfoAction
               avatar={data.user.profilePic}
               name={data.user.name}
@@ -85,7 +87,7 @@ const ProfileEdit = () => {
               ]}
             />
           </Col>
-          <Col md={8} sm={12}>
+          <Col md={9} sm={12}>
             <Title sx={{ paddingBottom: "1rem" }} order={2}>
               Edit Profile
             </Title>

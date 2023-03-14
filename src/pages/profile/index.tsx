@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 
+import { Navbar } from "@/components/Navbar";
 import { useUserClubs } from "@/hooks/useClub";
 import { useUser } from "@/hooks/useUser";
 import { IClub } from "@/models/club";
@@ -33,34 +34,37 @@ const Index = () => {
   }
 
   return (
-    <Container size="xl">
-      <Grid>
-        <Col md={3} sm={12}>
-          <UserInfoAction
-            avatar={userData.user.profilePic}
-            name={userData.user.name}
-            email={userData.user.email}
-            links={[
-              {
-                variant: "default",
-                label: "Edit Profile",
-                href: "/profile/edit",
-              },
-            ]}
-          />
-        </Col>
-        <Col md={9} sm={12}>
-          <Title sx={{ paddingBottom: "1rem" }} order={2}>
-            Clubs
-          </Title>
-          {clubsData.clubs.length > 0 ? (
-            <UserClubsTable data={clubsData.clubs} />
-          ) : (
-            <Text>No Clubs found</Text>
-          )}
-        </Col>
-      </Grid>
-    </Container>
+    <>
+      <Navbar />
+      <Container size="xl">
+        <Grid>
+          <Col md={3} sm={12}>
+            <UserInfoAction
+              avatar={userData.user.profilePic}
+              name={userData.user.name}
+              email={userData.user.email}
+              links={[
+                {
+                  variant: "default",
+                  label: "Edit Profile",
+                  href: "/profile/edit",
+                },
+              ]}
+            />
+          </Col>
+          <Col md={9} sm={12}>
+            <Title sx={{ paddingBottom: "1rem" }} order={2}>
+              Clubs
+            </Title>
+            {clubsData.clubs.length > 0 ? (
+              <UserClubsTable data={clubsData.clubs} />
+            ) : (
+              <Text>No Clubs found</Text>
+            )}
+          </Col>
+        </Grid>
+      </Container>
+    </>
   );
 };
 

@@ -2,6 +2,7 @@ import { GetStaticProps, InferGetStaticPropsType } from "next";
 import { Inter } from "next/font/google";
 import Head from "next/head";
 
+import { Navbar } from "@/components/Navbar";
 import Club from "@/models/club";
 import { connectDatabase } from "@/utils/db";
 
@@ -18,8 +19,10 @@ export default function Home(
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={inter.className}></main>
-      <pre>{JSON.stringify(props.clubs, null, 2)}</pre>
+      <main className={inter.className}>
+        <Navbar />
+        <pre>{JSON.stringify(props.clubs, null, 2)}</pre>
+      </main>
     </>
   );
 }
