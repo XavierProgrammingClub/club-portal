@@ -93,7 +93,10 @@ const SingleClubPage = (
             if (!member.showcase) return;
 
             return (
-              <Card key={member._id} sx={{ textAlign: "center" }}>
+              <Card
+                key={member._id}
+                sx={{ textAlign: "center", background: "none" }}
+              >
                 <Avatar
                   src={`https://res.cloudinary.com/dmixkq1uo/image/upload/w_200/${member.user.profilePic}`}
                   size={75}
