@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import Club from "@/models/club";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 import { connectDatabase } from "@/utils/db";
+import { updateAnnouncementSchema, updateMemberSchema } from "@/validators";
 
 export default async function handler(
   req: NextApiRequest,
@@ -94,6 +95,7 @@ export default async function handler(
         members: {
           $elemMatch: {
             user: user._id,
+            // TODO: Only president can edit members
             "permissions.canManagePermissions": true,
           },
         },
@@ -104,6 +106,14 @@ export default async function handler(
           .status(401)
           .json({ status: "ERROR", message: "Unauthorized" });
       }
+
+      const parsed = updateMemberSchema.safeParse(req.body);
+      if (!parsed.success)
+        return res.status(422).json({
+          status: "ERROR",
+          message: "Validation Error Occurred",
+          error: parsed.error,
+        });
 
       // const parsed = updateClubSchema.safeParse(req.body);
       // if (!parsed.success)

@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import Club from "@/models/club";
+import Club, { IAnnouncement, IClub } from "@/models/club";
 import User from "@/models/user";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 import { connectDatabase } from "@/utils/db";
-import { newMemberSchema } from "@/validators";
+import { newAnnouncementSchema } from "@/validators";
 
 export default async function handler(
   req: NextApiRequest,
@@ -22,16 +22,6 @@ export default async function handler(
               @GET /api/clubs/:id/members
               @desc Get all members
             */
-    if (req.method === "GET") {
-      const club = await Club.findById(id).populate("members.user");
-
-      if (!club)
-        return res
-          .status(404)
-          .json({ status: "ERROR", message: "Club not found!" });
-
-      return res.json({ status: "OK", members: club.members });
-    }
 
     const user = await getCurrentUserDetails({ req, res });
 
@@ -39,8 +29,46 @@ export default async function handler(
       return res.status(401).json({ status: "ERROR", message: "Unauthorized" });
     }
 
+    if (req.method === "GET") {
+      const club = await Club.find({
+        _id: id,
+        members: {
+          $elemMatch: {
+            user: user._id,
+          },
+        },
+      }).populate("announcements.author.user");
+
+      if (!club)
+        return res
+          .status(404)
+          .json({ status: "ERROR", message: "Club not found!" });
+
+      return res.json({
+        status: "OK",
+        announcements: club[0].announcements.sort(
+          (a: IAnnouncement, b: IAnnouncement) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ),
+      });
+    }
+
+    const club = await Club.find({
+      _id: id,
+      members: {
+        $elemMatch: {
+          user: user._id,
+          "permissions.canPublishAnnouncements": true,
+        },
+      },
+    });
+
+    if (!(user.role === "superuser") && club.length <= 0) {
+      return res.status(401).json({ status: "ERROR", message: "Unauthorized" });
+    }
+
     if (req.method === "POST") {
-      const parsed = newMemberSchema.safeParse(req.body);
+      const parsed = newAnnouncementSchema.safeParse(req.body);
       if (!parsed.success)
         return res.status(422).json({
           status: "ERROR",
@@ -50,46 +78,27 @@ export default async function handler(
 
       const { data } = parsed;
 
-      const club = await Club.find({
-        _id: id,
-        members: {
-          $elemMatch: {
-            user: user._id,
-            "permissions.canAddMembers": true,
-          },
-        },
-      });
-
-      if (!(user.role === "superuser") && club.length <= 0) {
-        return res
-          .status(401)
-          .json({ status: "ERROR", message: "Unauthorized" });
-      }
-
-      if (!mongoose.Types.ObjectId.isValid(data.user))
+      if (!mongoose.Types.ObjectId.isValid(data.author.user))
         return res
           .status(400)
           .json({ status: "ERROR", message: "Invalid Member!" });
 
-      const userExists = await User.exists({ _id: data.user });
+      const userExists = await User.exists({ _id: data.author.user });
       if (!userExists)
         return res
           .status(400)
           .json({ status: "ERROR", message: "Invalid Member!" });
 
       await Club.updateOne(
-        { _id: id, "members.user": { $ne: data.user } },
-        { $push: { members: data } }
+        { _id: id },
+        { $push: { announcements: { ...data, createdAt: Date.now() } } }
       );
 
-      return res.json({ status: "OK", message: "Member added successfully!" });
+      return res.json({
+        status: "OK",
+        message: "Announcement created successfully!",
+      });
     }
-    //
-    // const user = await getCurrentUserDetails({ req, res });
-    //
-    // if (!user) {
-    //   return res.status(401).json({ status: "ERROR", message: "Unauthorized" });
-    // }
   } catch (error) {
     console.log(error);
     return res.status(400).json({ status: "ERROR", error });

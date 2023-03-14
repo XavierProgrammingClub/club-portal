@@ -33,36 +33,34 @@ const Index = () => {
   }
 
   return (
-    <>
-      <Container size="xl">
-        <Grid>
-          <Col md={4} sm={12}>
-            <UserInfoAction
-              avatar={userData.user.profilePic}
-              name={userData.user.name}
-              email={userData.user.email}
-              links={[
-                {
-                  variant: "default",
-                  label: "Edit Profile",
-                  href: "/profile/edit",
-                },
-              ]}
-            />
-          </Col>
-          <Col md={8} sm={12}>
-            <Title sx={{ paddingBottom: "1rem" }} order={2}>
-              Clubs
-            </Title>
-            {clubsData.clubs.length > 0 ? (
-              <UserClubsTable data={clubsData.clubs} />
-            ) : (
-              <Text>No Clubs found</Text>
-            )}
-          </Col>
-        </Grid>
-      </Container>
-    </>
+    <Container size="xl">
+      <Grid>
+        <Col md={3} sm={12}>
+          <UserInfoAction
+            avatar={userData.user.profilePic}
+            name={userData.user.name}
+            email={userData.user.email}
+            links={[
+              {
+                variant: "default",
+                label: "Edit Profile",
+                href: "/profile/edit",
+              },
+            ]}
+          />
+        </Col>
+        <Col md={9} sm={12}>
+          <Title sx={{ paddingBottom: "1rem" }} order={2}>
+            Clubs
+          </Title>
+          {clubsData.clubs.length > 0 ? (
+            <UserClubsTable data={clubsData.clubs} />
+          ) : (
+            <Text>No Clubs found</Text>
+          )}
+        </Col>
+      </Grid>
+    </Container>
   );
 };
 

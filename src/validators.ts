@@ -37,17 +37,19 @@ export const newMemberSchema = z.object({
 });
 
 export const updateMemberSchema = z.object({
-  role: z.string().min(3),
+  role: z.string().min(3).optional(),
   rank: z.number().optional(),
-  showcase: z.boolean(),
-  permissions: z.object({
-    canAddMembers: z.boolean(),
-    canPublishAnnouncements: z.boolean(),
-    canRemoveMembers: z.boolean(),
-    canPublishBlogs: z.boolean(),
-    canManageClubSettings: z.boolean(),
-    canManagePermissions: z.boolean(),
-  }),
+  showcase: z.boolean().optional(),
+  permissions: z
+    .object({
+      canAddMembers: z.boolean().optional(),
+      canPublishAnnouncements: z.boolean().optional(),
+      canRemoveMembers: z.boolean().optional(),
+      canPublishBlogs: z.boolean().optional(),
+      canManageClubSettings: z.boolean().optional(),
+      canManagePermissions: z.boolean().optional(),
+    })
+    .optional(),
 });
 
 export const newClubSchema = z.object({
@@ -67,6 +69,22 @@ export const updateClubSchema = z.object({
   isAvailableForRegistration: z.boolean().optional(),
 });
 
+export const newAnnouncementSchema = z.object({
+  title: z.string().min(5).max(120),
+  description: z.string().min(5).max(500),
+  author: z.object({
+    user: z.string(),
+    role: z.string(),
+  }),
+  photo: z.string().optional(),
+});
+
+export const updateAnnouncementSchema = z.object({
+  title: z.string().min(5).max(120).optional(),
+  description: z.string().min(5).max(500).optional(),
+  photo: z.string().optional().optional(),
+});
+
 export const adminUpdateClubSchema = updateClubSchema.merge(z.object({}));
 
 export type LoginUserCredentialsDTO = z.infer<typeof loginUserSchema>;
@@ -75,10 +93,19 @@ export type UpdateUserCredentialsDTO = z.infer<typeof updateUserSchema>;
 export type AdminUpdateUserCredentialsDTO = z.infer<
   typeof adminUpdateUserSchema
 >;
+
 export type NewClubCredentialsDTO = z.infer<typeof newClubSchema>;
 export type UpdateClubCredentialsDTO = z.infer<typeof updateClubSchema>;
 export type AdminUpdateClubCredentialsDTO = z.infer<
   typeof adminUpdateClubSchema
 >;
+
 export type NewMemberCredentialsDTO = z.infer<typeof newMemberSchema>;
 export type UpdateMemberCredentialsDTO = z.infer<typeof updateMemberSchema>;
+
+export type NewAnnouncementCredentialsDTO = z.infer<
+  typeof newAnnouncementSchema
+>;
+export type UpdateAnnouncementCredentialsDTO = z.infer<
+  typeof updateAnnouncementSchema
+>;

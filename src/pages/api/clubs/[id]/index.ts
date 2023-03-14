@@ -23,10 +23,9 @@ export default async function handler(
         */
 
     if (req.method === "GET") {
-      const club = await Club.findById(id).populate(
-        "members.user",
-        "-password"
-      );
+      const club = await Club.findById(id)
+        .populate("members.user", "-password")
+        .select("-announcements");
 
       if (!club)
         return res

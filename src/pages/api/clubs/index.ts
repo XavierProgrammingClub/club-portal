@@ -19,7 +19,7 @@ export default async function handler(
       @desc Get all clubs
     */
     if (req.method === "GET") {
-      const clubs = await Club.find();
+      const clubs = await Club.find().select("-announcements");
 
       return res.json({ status: "OK", clubs });
     }

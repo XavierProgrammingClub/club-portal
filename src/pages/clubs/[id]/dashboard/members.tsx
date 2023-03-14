@@ -504,37 +504,37 @@ const EditMemberDrawer = (props: MemberDrawerProps & { memberId: string }) => {
         <Switch
           label="Can add members"
           mt="sm"
-          checked={form.values.permissions.canAddMembers}
+          checked={form.values.permissions?.canAddMembers}
           {...form.getInputProps("permissions.canAddMembers")}
         />
         <Switch
           label="Can remove members"
           mt="sm"
-          checked={form.values.permissions.canRemoveMembers}
+          checked={form.values.permissions?.canRemoveMembers}
           {...form.getInputProps("permissions.canRemoveMembers")}
         />
         <Switch
           label="Can publish announcements"
           mt="sm"
-          checked={form.values.permissions.canPublishAnnouncements}
+          checked={form.values.permissions?.canPublishAnnouncements}
           {...form.getInputProps("permissions.canPublishAnnouncements")}
         />
         <Switch
           label="Can publish blogs"
           mt="sm"
-          checked={form.values.permissions.canPublishBlogs}
+          checked={form.values.permissions?.canPublishBlogs}
           {...form.getInputProps("permissions.canPublishBlogs")}
         />
         <Switch
           label="Can manage club settings"
           mt="sm"
-          checked={form.values.permissions.canManageClubSettings}
+          checked={form.values.permissions?.canManageClubSettings}
           {...form.getInputProps("permissions.canManageClubSettings")}
         />
         <Switch
           label="Can manage permissions"
           mt="sm"
-          checked={form.values.permissions.canManagePermissions}
+          checked={form.values.permissions?.canManagePermissions}
           {...form.getInputProps("permissions.canManagePermissions")}
         />
 
