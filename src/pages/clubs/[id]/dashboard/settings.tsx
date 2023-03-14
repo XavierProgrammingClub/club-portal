@@ -135,7 +135,7 @@ const ClubSettings = () => {
 
           <Textarea
             sx={{ marginTop: "1rem" }}
-            label="Description"
+            label="Short Description"
             {...form.getInputProps("shortDescription")}
             withAsterisk
             autosize

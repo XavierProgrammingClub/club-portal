@@ -159,6 +159,7 @@ export const Navbar = () => {
       href={`/clubs/${item._id}`}
       className={classes.subLink}
       key={item._id}
+      onClick={closeDrawer}
     >
       <Group noWrap align="flex-start">
         <Avatar
@@ -305,24 +306,26 @@ export const Navbar = () => {
             color={theme.colorScheme === "dark" ? "dark.5" : "gray.1"}
           />
 
-          <a href="#" className={classes.link}>
+          <Link onClick={closeDrawer} href="/" className={classes.link}>
             Home
-          </a>
+          </Link>
           <UnstyledButton className={classes.link} onClick={toggleLinks}>
             <Center inline>
               <Box component="span" mr={5}>
-                Features
+                Clubs
               </Box>
               <IconChevronDown size={16} color={theme.fn.primaryColor()} />
             </Center>
           </UnstyledButton>
-          <Collapse in={linksOpened}>{links}</Collapse>
-          <a href="#" className={classes.link}>
-            Learn
-          </a>
-          <a href="#" className={classes.link}>
-            Academy
-          </a>
+          <Collapse in={linksOpened}>
+            <div style={{ marginLeft: "1rem" }}>{links}</div>
+          </Collapse>
+          <Link onClick={closeDrawer} href="/about" className={classes.link}>
+            About
+          </Link>
+          <Link onClick={closeDrawer} href="/contact" className={classes.link}>
+            Contact
+          </Link>
 
           <Divider
             my="sm"
@@ -330,8 +333,37 @@ export const Navbar = () => {
           />
 
           <Group position="center" grow pb="xl" px="md">
-            <Button variant="default">Log in</Button>
-            <Button>Sign up</Button>
+            {!isLoading && isError ? (
+              <>
+                <Button
+                  onClick={closeDrawer}
+                  component={Link}
+                  href="/auth/signin"
+                  variant="default"
+                >
+                  Log in
+                </Button>
+              </>
+            ) : null}
+
+            {!isLoading && data ? (
+              <>
+                {data.user.role === "superuser" ? (
+                  <Button component={Link} href="/admin" onClick={closeDrawer}>
+                    Admin
+                  </Button>
+                ) : null}
+
+                <Button
+                  variant={"outline"}
+                  component={Link}
+                  href="/profile"
+                  onClick={closeDrawer}
+                >
+                  Profile
+                </Button>
+              </>
+            ) : null}
           </Group>
         </ScrollArea>
       </Drawer>

@@ -57,7 +57,7 @@ export default function Home(
   );
 }
 
-const useStyles = createStyles((theme) => ({
+export const useStyles = createStyles((theme) => ({
   wrapper: {
     position: "relative",
     paddingTop: rem(180),

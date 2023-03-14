@@ -1,11 +1,15 @@
 import {
   Avatar,
+  Badge,
   Button,
+  Card,
   Col,
   Container,
+  Flex,
   Grid,
   Group,
   Paper,
+  SimpleGrid,
   Text,
   Title,
   TypographyStylesProvider,
@@ -14,13 +18,12 @@ import {
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { NextParsedUrlQuery } from "next/dist/server/request-meta";
 import Link from "next/link";
-import { CldImage } from "next-cloudinary";
 import React from "react";
 
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import Club, { IClub, IMember } from "@/models/club";
-import { IUser } from "@/models/user";
+import { useStyles } from "@/pages";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 import { connectDatabase } from "@/utils/db";
 
@@ -28,6 +31,7 @@ const SingleClubPage = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) => {
   const theme = useMantineTheme();
+  const { classes } = useStyles();
 
   return (
     <>
@@ -73,6 +77,44 @@ const SingleClubPage = (
             />
           </Col>
         </Grid>
+      </Container>
+
+      <Container id="clubs" size="xl" className={classes.clubsWrapper}>
+        <Title className={classes.clubsTitle}>Members</Title>
+
+        <Flex
+          gap={"xl"}
+          wrap={"wrap"}
+          justify={"center"}
+          mt={50}
+          sx={{ placeItems: "center" }}
+        >
+          {props.club.members.map((member) => {
+            if (!member.showcase) return;
+
+            return (
+              <Card key={member._id} sx={{ textAlign: "center" }}>
+                <Avatar
+                  src={`https://res.cloudinary.com/dmixkq1uo/image/upload/w_200/${member.user.profilePic}`}
+                  size={75}
+                  radius={75}
+                  sx={{ objectFit: "cover" }}
+                  mx="auto"
+                />
+                <Badge mt="md">{member.role}</Badge>
+                <Text
+                  ta="center"
+                  fz="lg"
+                  sx={{ marginTop: "0" }}
+                  weight={500}
+                  component="h1"
+                >
+                  {member.user.name}
+                </Text>
+              </Card>
+            );
+          })}
+        </Flex>
       </Container>
 
       <Footer />
@@ -153,7 +195,7 @@ export const getServerSideProps: GetServerSideProps<IProps> = async (
   await connectDatabase();
 
   try {
-    const club = (await Club.findById(id)) as IClub;
+    const club = (await Club.findById(id).populate("members.user")) as IClub;
     if (!club) throw new Error("Club not found!");
 
     try {
