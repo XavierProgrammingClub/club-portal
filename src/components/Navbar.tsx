@@ -210,7 +210,7 @@ export const Navbar = () => {
   ));
 
   return (
-    <Box mb={"md"}>
+    <Box mb={"md"} pos={"sticky"} top={0}>
       <Header height={60} px="md">
         <Container size="xl">
           <Group position="apart" sx={{ height: 60 }}>
@@ -376,7 +376,7 @@ const UserMenu = () => {
 
   const { data } = useUser();
 
-  if (!data) return;
+  if (!data) return null;
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
