@@ -2,8 +2,9 @@ import { genSalt, hash } from "bcryptjs";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import User from "@/models/user";
+import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 import { connectDatabase } from "@/utils/db";
-import { newUserSchema } from "@/validators";
+import { adminNewUserSchema, newUserSchema } from "@/validators";
 
 export default async function handler(
   req: NextApiRequest,
@@ -19,7 +20,7 @@ export default async function handler(
      @desc Signup User
     */
     if (req.method === "POST") {
-      const parsed = newUserSchema.safeParse(req.body);
+      const parsed = adminNewUserSchema.safeParse(req.body);
       if (!parsed.success)
         return res.status(422).json({
           status: "ERROR",
@@ -30,6 +31,16 @@ export default async function handler(
       const { data } = parsed;
 
       const user = await User.findOne({ email: data.email });
+
+      if (!data.profilePic) data.profilePic = "users/r28y6kquvetyzvzpybxp";
+      if (data.role === "superuser") {
+        const user = await getCurrentUserDetails({ req, res });
+        if (user.role !== "superuser") {
+          return res
+            .status(422)
+            .json({ status: "ERROR", message: "You are not an admin" });
+        }
+      }
 
       if (user)
         return res

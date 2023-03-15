@@ -14,12 +14,22 @@ export const newUserSchema = z.object({
   email: z.string().email().max(1024).min(3),
 });
 
+export const adminNewUserSchema = newUserSchema.merge(
+  z.object({ role: z.string().optional() })
+);
+
 export const updateUserSchema = z.object({
   profilePic: z.string().optional(),
   name: z.string().min(3).max(255).optional(),
 });
 
-export const adminUpdateUserSchema = updateUserSchema.merge(z.object({}));
+export const adminUpdateUserSchema = updateUserSchema.merge(
+  z.object({
+    email: z.string().min(3).optional(),
+    role: z.string().optional(),
+    password: z.string().optional(),
+  })
+);
 
 export const newMemberSchema = z.object({
   user: z.string(),
@@ -56,7 +66,7 @@ export const newClubSchema = z.object({
   name: z.string(),
   shortDescription: z.string().optional(),
   description: z.string().optional(),
-  profilePic: z.string(),
+  profilePic: z.string().optional(),
   banner: z.string().optional(),
   members: z.array(newMemberSchema).optional(),
   isAvailableForRegistration: z.boolean(),
@@ -91,6 +101,7 @@ export const adminUpdateClubSchema = updateClubSchema.merge(z.object({}));
 
 export type LoginUserCredentialsDTO = z.infer<typeof loginUserSchema>;
 export type NewUserCredentialsDTO = z.infer<typeof newUserSchema>;
+export type AdminNewUserCredentialsDTO = z.infer<typeof adminNewUserSchema>;
 export type UpdateUserCredentialsDTO = z.infer<typeof updateUserSchema>;
 export type AdminUpdateUserCredentialsDTO = z.infer<
   typeof adminUpdateUserSchema

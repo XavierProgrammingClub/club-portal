@@ -736,7 +736,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
   await connectDatabase();
 
   const clubs = (await Club.find().limit(5)) as IClub[];
-
   return {
     props: { clubs: JSON.parse(JSON.stringify(clubs)) },
     revalidate: 100,

@@ -6,11 +6,7 @@ import { axios } from "@/lib/axios";
 import { IUser } from "@/models/user";
 
 const getUser = async (): Promise<{ status: "OK" | "ERROR"; user: IUser }> => {
-  const data = (await axios.get("/api/users/info")) as {
-    status: "OK" | "ERROR";
-    user: IUser;
-  };
-  return data;
+  return axios.get("/api/users/info");
 };
 
 export const useUser = (context?: {

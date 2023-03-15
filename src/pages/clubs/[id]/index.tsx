@@ -90,6 +90,7 @@ const SingleClubPage = (
           sx={{ placeItems: "center" }}
         >
           {props.club.members.map((member) => {
+            if (!member.user) return;
             if (!member.showcase) return;
 
             return (

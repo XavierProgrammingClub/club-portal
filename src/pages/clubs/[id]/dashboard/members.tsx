@@ -73,28 +73,6 @@ const AdminSingleClub = () => {
     { href: `/clubs/${id}/dashboard/members`, title: "Members" },
   ];
 
-  const handleDeleteMember = async (user: IUser) => {
-    openConfirmModal({
-      title: "Delete club member",
-      centered: true,
-      children: (
-        <Text size="sm">
-          Are you sure you want to delete this member ({user.name} #{user._id})?
-        </Text>
-      ),
-      labels: { confirm: "Delete Member", cancel: "No don't delete" },
-      confirmProps: { color: "red" },
-      onConfirm: async () => {
-        try {
-          await axios.delete(`/api/clubs/${id}/members/${user._id}`);
-        } catch (error) {
-          console.log(error);
-        }
-        await queryClient.refetchQueries(["club", id]);
-      },
-    });
-  };
-
   return (
     <ClubDashboardLayout>
       <Container size="xl">
@@ -120,10 +98,7 @@ const AdminSingleClub = () => {
           <AddMemberDrawer opened={drawerOpened} onClose={handleCloseDrawer} />
         </Stack>
 
-        <ClubMembersTable
-          data={data?.club.members || []}
-          onDeleteMember={handleDeleteMember}
-        />
+        <ClubMembersTable data={data?.club.members || []} />
       </Container>
     </ClubDashboardLayout>
   );
@@ -579,76 +554,104 @@ const MembersAutoCompleteItem = forwardRef<
 
 interface ClubMembersTableProps {
   data: IClub["members"] | [];
-  onDeleteMember: (user: IUser) => void;
 }
 
-export function ClubMembersTable({
-  data,
-  onDeleteMember,
-}: ClubMembersTableProps) {
+export function ClubMembersTable({ data }: ClubMembersTableProps) {
+  const router = useRouter();
+
+  const { id } = router.query;
+
   const { isUserInClub, isSuperUser } = useUserClubDetails();
   const [drawerOpened, { open: handleOpenDrawer, close: handleCloseDrawer }] =
     useDisclosure(false);
   const [selectedMemberId, setSelectedMemberid] = useState<string>("");
 
-  const rows = data.map((item) => (
-    <tr key={item._id}>
-      <td>
-        <Group spacing="sm">
-          <Avatar
-            size={40}
-            src={`https://res.cloudinary.com/dmixkq1uo/image/upload/w_50/${item.user.profilePic}`}
-            radius={40}
-            sx={{ objectFit: "cover" }}
-          />
-          <div>
-            <Anchor
-              component={Link}
-              href={`/users/${item.user._id}`}
-              fz="sm"
-              fw={500}
-            >
-              {item.user.name}
-            </Anchor>
-            <Text fz="xs" c="dimmed">
-              {item.user.email}
-            </Text>
-          </div>
-        </Group>
-      </td>
+  console.log(data);
 
-      <td>
-        <Badge color="blue">{item.role}</Badge>
-      </td>
+  const handleDeleteMember = async (user: IUser) => {
+    openConfirmModal({
+      title: "Delete club member",
+      centered: true,
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete this member ({user.name} #{user._id})?
+        </Text>
+      ),
+      labels: { confirm: "Delete Member", cancel: "No don't delete" },
+      confirmProps: { color: "red" },
+      onConfirm: async () => {
+        try {
+          await axios.delete(`/api/clubs/${id}/members/${user._id}`);
+        } catch (error) {
+          console.log(error);
+        }
+        await queryClient.refetchQueries(["club", id]);
+      },
+    });
+  };
 
-      <td>
-        <Group>
-          {isSuperUser || isUserInClub?.role === "President" ? (
-            <ActionIcon
-              onClick={() => {
-                setSelectedMemberid(item._id);
-                handleOpenDrawer();
-              }}
-              variant="outline"
-              color="blue"
-            >
-              <IconEdit size={18} />
-            </ActionIcon>
-          ) : null}
+  const rows = data.map((item) => {
+    if (!item.user) return;
 
-          {isSuperUser || isUserInClub?.permissions.canRemoveMembers ? (
-            <ActionIcon
-              variant="outline"
-              color="red"
-              onClick={() => onDeleteMember(item.user)}
-            >
-              <IconTrash size={18} />
-            </ActionIcon>
-          ) : null}
-        </Group>
-      </td>
-    </tr>
-  ));
+    return (
+      <tr key={item._id}>
+        <td>
+          <Group spacing="sm">
+            <Avatar
+              size={40}
+              src={`https://res.cloudinary.com/dmixkq1uo/image/upload/w_50/${item.user.profilePic}`}
+              radius={40}
+              sx={{ objectFit: "cover" }}
+            />
+            <div>
+              <Anchor
+                component={Link}
+                href={`/users/${item.user._id}`}
+                fz="sm"
+                fw={500}
+              >
+                {item.user.name}
+              </Anchor>
+              <Text fz="xs" c="dimmed">
+                {item.user.email}
+              </Text>
+            </div>
+          </Group>
+        </td>
+
+        <td>
+          <Badge color="blue">{item.role}</Badge>
+        </td>
+
+        <td>
+          <Group>
+            {isSuperUser || isUserInClub?.role === "President" ? (
+              <ActionIcon
+                onClick={() => {
+                  setSelectedMemberid(item._id);
+                  handleOpenDrawer();
+                }}
+                variant="outline"
+                color="blue"
+              >
+                <IconEdit size={18} />
+              </ActionIcon>
+            ) : null}
+
+            {isSuperUser || isUserInClub?.permissions.canRemoveMembers ? (
+              <ActionIcon
+                variant="outline"
+                color="red"
+                onClick={() => handleDeleteMember(item.user)}
+              >
+                <IconTrash size={18} />
+              </ActionIcon>
+            ) : null}
+          </Group>
+        </td>
+      </tr>
+    );
+  });
 
   return (
     <ScrollArea>

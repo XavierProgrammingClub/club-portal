@@ -1,8 +1,10 @@
+import { genSalt, hash } from "bcryptjs";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import User from "@/models/user";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 import { connectDatabase } from "@/utils/db";
+import { adminNewUserSchema, adminUpdateUserSchema } from "@/validators";
 
 export default async function handler(
   req: NextApiRequest,
@@ -55,7 +57,35 @@ export default async function handler(
       @desc Update a user details
     */
     if (req.method === "PATCH") {
-      await User.updateOne({ _id: id }, req.body);
+      const parsed = adminUpdateUserSchema.safeParse(req.body);
+      if (!parsed.success)
+        return res.status(422).json({
+          status: "ERROR",
+          message: "Validation Error Occurred",
+          error: parsed.error,
+        });
+
+      const { data } = parsed;
+
+      if (data.role === "superuser") {
+        const user = await getCurrentUserDetails({ req, res });
+        if (user.role !== "superuser") {
+          return res
+            .status(422)
+            .json({ status: "ERROR", message: "You are not an admin" });
+        }
+      }
+      if (!data.profilePic) data.profilePic = "users/r28y6kquvetyzvzpybxp";
+      if (!data.password) delete data.password;
+
+      if (data.password) {
+        const salt = await genSalt(12);
+        data.password = await hash(data.password, salt);
+      }
+
+      console.log(data.password);
+
+      await User.updateOne({ _id: id }, data);
       return res.json({ status: "OK", message: "User updated successfully!" });
     }
   } catch (error) {

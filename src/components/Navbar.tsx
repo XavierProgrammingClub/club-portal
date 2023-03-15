@@ -273,7 +273,7 @@ export const Navbar = () => {
               {!isLoading && data ? (
                 <>
                   {data.user.role === "superuser" ? (
-                    <Button component={Link} href="/admin">
+                    <Button component={Link} href="/admin/users">
                       Admin
                     </Button>
                   ) : null}
@@ -349,7 +349,11 @@ export const Navbar = () => {
             {!isLoading && data ? (
               <>
                 {data.user.role === "superuser" ? (
-                  <Button component={Link} href="/admin" onClick={closeDrawer}>
+                  <Button
+                    component={Link}
+                    href="/admin/users"
+                    onClick={closeDrawer}
+                  >
                     Admin
                   </Button>
                 ) : null}

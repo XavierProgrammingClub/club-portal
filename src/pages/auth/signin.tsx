@@ -33,7 +33,6 @@ const SignIn = () => {
 
   const router = useRouter();
 
-  if (isLoading) return null;
   if (userData?.user) {
     router.push("/");
     return;
