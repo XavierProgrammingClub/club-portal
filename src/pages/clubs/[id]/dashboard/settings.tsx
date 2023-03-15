@@ -77,8 +77,6 @@ const ClubSettings = () => {
     form.setFieldValue("profilePic", a.info.public_id);
   };
 
-  console.log(form.errors);
-
   return (
     <ClubDashboardLayout>
       <Container size="xl">
@@ -202,7 +200,7 @@ function DescriptionEditor(props: {
   });
 
   return (
-    <RichTextEditor editor={editor} onChange={(v) => console.log(v)}>
+    <RichTextEditor editor={editor}>
       <RichTextEditor.Toolbar sticky stickyOffset={60}>
         <RichTextEditor.ControlsGroup>
           <RichTextEditor.Bold />
@@ -243,7 +241,7 @@ function DescriptionEditor(props: {
         </RichTextEditor.ControlsGroup>
       </RichTextEditor.Toolbar>
 
-      <RichTextEditor.Content onChange={(v) => console.log(v)} />
+      <RichTextEditor.Content />
     </RichTextEditor>
   );
 }

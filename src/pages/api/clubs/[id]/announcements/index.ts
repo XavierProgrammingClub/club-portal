@@ -39,7 +39,7 @@ export default async function handler(
         },
       }).populate("announcements.author.user");
 
-      if (!club)
+      if (club.length === 0)
         return res
           .status(404)
           .json({ status: "ERROR", message: "Club not found!" });
@@ -77,7 +77,6 @@ export default async function handler(
         });
 
       const { data } = parsed;
-
       if (!mongoose.Types.ObjectId.isValid(data.author.user))
         return res
           .status(400)

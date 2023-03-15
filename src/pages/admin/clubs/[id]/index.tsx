@@ -77,7 +77,6 @@ const AdminSingleClub = () => {
     const response = await axios.post(`/api/clubs/${id}/members/`, data);
     setIsModalOpened(false);
     await queryClient.refetchQueries(["club", id]);
-    console.log(response);
   };
 
   const handleDeleteMember = async (userId: string) => {

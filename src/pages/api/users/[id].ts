@@ -83,8 +83,6 @@ export default async function handler(
         data.password = await hash(data.password, salt);
       }
 
-      console.log(data.password);
-
       await User.updateOne({ _id: id }, data);
       return res.json({ status: "OK", message: "User updated successfully!" });
     }

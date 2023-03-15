@@ -566,8 +566,6 @@ export function ClubMembersTable({ data }: ClubMembersTableProps) {
     useDisclosure(false);
   const [selectedMemberId, setSelectedMemberid] = useState<string>("");
 
-  console.log(data);
-
   const handleDeleteMember = async (user: IUser) => {
     openConfirmModal({
       title: "Delete club member",
