@@ -550,6 +550,7 @@ export function ClubCard({ _id, image, title, description }: ClubCardProps) {
 
       <Group mt="xs">
         <Button
+          variant={"outline"}
           component={Link}
           href={`/clubs/${_id}`}
           radius="md"

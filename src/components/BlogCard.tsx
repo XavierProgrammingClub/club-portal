@@ -105,14 +105,20 @@ export const BlogCard = ({
           <Text fw={500}>{author.name}</Text>
 
           <Text fz="xs" c="dimmed" size="xs">
-            Posted <TimeAgo date={createdAt} />
+            Posted <TimeAgo live={false} date={createdAt} />
           </Text>
         </div>
       </Flex>
 
       <Card.Section className={classes.footer}>
         <Group position="apart">
-          <Button component={Link} href={href} radius="md" style={{ flex: 1 }}>
+          <Button
+            variant={"outline"}
+            component={Link}
+            href={href}
+            radius="md"
+            style={{ flex: 1 }}
+          >
             View details
           </Button>
 
