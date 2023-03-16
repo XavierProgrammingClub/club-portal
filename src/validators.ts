@@ -97,6 +97,13 @@ export const updateAnnouncementSchema = z.object({
   photo: z.string().optional().optional(),
 });
 
+export const blogSchema = z.object({
+  featuredImage: z.string().min(3, { message: "Featured image is required" }),
+  title: z.string().min(5).max(255),
+  content: z.string().min(10),
+  status: z.string().default("draft"),
+});
+
 export const adminUpdateClubSchema = updateClubSchema.merge(z.object({}));
 
 export type LoginUserCredentialsDTO = z.infer<typeof loginUserSchema>;
@@ -122,3 +129,5 @@ export type NewAnnouncementCredentialsDTO = z.infer<
 export type UpdateAnnouncementCredentialsDTO = z.infer<
   typeof updateAnnouncementSchema
 >;
+
+export type BlogCredentialsDTO = z.infer<typeof blogSchema>;

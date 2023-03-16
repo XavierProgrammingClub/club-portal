@@ -26,7 +26,7 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { CldUploadButton } from "next-cloudinary";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { AdminDashboardLayout } from "@/components/AdminDashboardLayout";
 import { useClubs } from "@/hooks/useClub";
@@ -302,6 +302,15 @@ const EditClubDrawer = (props: DrawerProps & { club: IClub }) => {
       isAvailableForRegistration: props.club.isAvailableForRegistration,
     },
   });
+
+  useEffect(() => {
+    form.setValues({
+      profilePic: props.club.profilePic,
+      name: props.club.name,
+      shortDescription: props.club.shortDescription,
+      isAvailableForRegistration: props.club.isAvailableForRegistration,
+    });
+  }, [props.club]);
 
   const handleUpdateClub = async (data: UpdateClubCredentialsDTO) => {
     await axios.patch(`/api/clubs/${props.club?._id}`, data);

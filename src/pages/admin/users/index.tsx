@@ -319,6 +319,15 @@ const EditUserDrawer = (props: DrawerProps & { user: IUser }) => {
     },
   });
 
+  useEffect(() => {
+    form.setValues({
+      profilePic: props.user.profilePic,
+      name: props.user.name,
+      email: props.user.email,
+      role: props.user.role,
+    });
+  }, [props.user]);
+
   const handleUpdateUser = async (data: AdminUpdateUserCredentialsDTO) => {
     await axios.patch(`/api/users/${props.user?._id}/`, data);
     form.reset();

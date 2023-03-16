@@ -182,7 +182,10 @@ const ClubSettings = () => {
   );
 };
 
-function DescriptionEditor(props: { content: string; editor: null | Editor }) {
+export function DescriptionEditor(props: {
+  content: string;
+  editor: null | Editor;
+}) {
   return (
     <RichTextEditor editor={props.editor}>
       <RichTextEditor.Toolbar sticky stickyOffset={60}>

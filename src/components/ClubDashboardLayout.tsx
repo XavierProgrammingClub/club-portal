@@ -29,6 +29,7 @@ import {
   IconHome,
   IconUsers,
   IconUser,
+  IconFile,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -123,6 +124,12 @@ export const data = [
     color: "blue",
     label: "Home",
     href: "",
+  },
+  {
+    icon: <IconFile size={16} />,
+    color: "red",
+    label: "Blogs",
+    href: "blogs",
   },
   {
     icon: <IconUsers size={16} />,

@@ -5,17 +5,19 @@ import { IUser } from "@/models/user";
 
 export interface IBlog {
   _id: string;
+  featuredImage: string;
   title: string;
   content: string;
   author: {
     user: string | IUser;
     club: string | IClub;
   };
-  status: "public" | "internal" | "draft";
+  status: "public" | "draft";
 }
 
 const blogSchema = new mongoose.Schema<IBlog>(
   {
+    featuredImage: { type: String, required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
     author: {
@@ -26,7 +28,7 @@ const blogSchema = new mongoose.Schema<IBlog>(
       type: String,
       required: true,
       default: "draft",
-      enum: ["public", "internal", "draft"],
+      enum: ["public", "draft"],
     },
   },
   {
