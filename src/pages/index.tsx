@@ -26,8 +26,10 @@ import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 import React from "react";
 
+import { BlogCard } from "@/components/BlogCard";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import Blog, { IBlog } from "@/models/blog";
 import Club, { IClub } from "@/models/club";
 import { connectDatabase } from "@/utils/db";
 
@@ -49,9 +51,9 @@ export default function Home(
         <HeroSection />
         <FeaturesCards />
         <ClubsSection clubs={props.clubs} />
+        <BlogsSection blogs={props.blogs} />
         <WhatAreYouThinkingSection />
         <Footer />
-        {/*<pre>{JSON.stringify(props.clubs, null, 2)}</pre>*/}
       </main>
     </>
   );
@@ -612,6 +614,49 @@ export function WhatAreYouThinkingSection() {
   );
 }
 
+export const BlogsSection = (props: { blogs: IBlog[] }) => {
+  const { classes } = useStyles();
+
+  return (
+    <Container id="clubs" size="xl" className={classes.clubsWrapper}>
+      <Title className={classes.clubsTitle}>Blogs</Title>
+
+      <Container size={560} p={0}>
+        <Text size="sm" className={classes.clubsDescription}>
+          Explore our diverse range of clubs and organizations at Xavier
+          International College, catering to a wide range of interests,
+          passions, and pursuits. Discover your community today.
+        </Text>
+      </Container>
+
+      <SimpleGrid
+        mt="2rem"
+        cols={4}
+        breakpoints={[
+          { maxWidth: "lg", cols: 4 },
+          { maxWidth: "md", cols: 3 },
+          { maxWidth: "sm", cols: 2 },
+          { maxWidth: "xs", cols: 1 },
+        ]}
+      >
+        {props.blogs.map((blog) => (
+          <BlogCard
+            key={blog._id}
+            image={blog.featuredImage}
+            title={blog.title}
+            createdAt={new Date(blog.createdAt)}
+            href={`/blogs/${blog._id}`}
+            author={{
+              name: (blog.author.club as any).name,
+              image: (blog.author.club as any).profilePic,
+            }}
+          />
+        ))}
+      </SimpleGrid>
+    </Container>
+  );
+};
+
 interface DotsProps extends React.ComponentPropsWithoutRef<"svg"> {
   size?: number;
   radius?: number;
@@ -735,9 +780,16 @@ function Dots({ size = 185, radius = 2.5, ...others }: DotsProps) {
 export const getStaticProps: GetStaticProps = async (context) => {
   await connectDatabase();
 
-  const clubs = (await Club.find().limit(5)) as IClub[];
+  const clubs = (await Club.find()) as IClub[];
+  const blogs = (await Blog.find({ status: "public" })
+    .limit(8)
+    .populate("author.club", "name profilePic")) as IBlog[];
+
   return {
-    props: { clubs: JSON.parse(JSON.stringify(clubs)) },
+    props: {
+      clubs: JSON.parse(JSON.stringify(clubs)),
+      blogs: JSON.parse(JSON.stringify(blogs)),
+    },
     revalidate: 100,
   };
 };

@@ -188,6 +188,9 @@ export const Navbar = () => {
                   </SimpleGrid>
                 </HoverCard.Dropdown>
               </HoverCard>
+              <Link href="/blogs" className={classes.link}>
+                Blogs
+              </Link>
               <Link href="/about" className={classes.link}>
                 About
               </Link>
@@ -273,6 +276,9 @@ export const Navbar = () => {
           <Collapse in={linksOpened}>
             <div style={{ marginLeft: "1rem" }}>{links}</div>
           </Collapse>
+          <Link href="/blogs" className={classes.link}>
+            Blogs
+          </Link>
           <Link onClick={closeDrawer} href="/about" className={classes.link}>
             About
           </Link>

@@ -13,6 +13,7 @@ export interface IBlog {
     club: string | IClub;
   };
   status: "public" | "draft";
+  createdAt: string;
 }
 
 const blogSchema = new mongoose.Schema<IBlog>(

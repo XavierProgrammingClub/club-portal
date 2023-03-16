@@ -91,7 +91,6 @@ export default async function handler(
         });
 
       const { data } = parsed;
-      console.log(data);
 
       await Blog.create({
         ...data,

@@ -10,6 +10,7 @@ import {
   ActionIcon,
   ScrollArea,
   Table,
+  SimpleGrid,
 } from "@mantine/core";
 import { openConfirmModal } from "@mantine/modals";
 import { IconEdit, IconSearch, IconTrash } from "@tabler/icons-react";
@@ -18,6 +19,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 
+import { BlogCard } from "@/components/BlogCard";
 import { ClubDashboardLayout } from "@/components/ClubDashboardLayout";
 import { DashboardBreadCrumb } from "@/components/DashboardBreadCrumb";
 import { useSingleClub } from "@/hooks/useClub";
@@ -51,6 +53,28 @@ const ClubBlogs = () => {
     { href: `/clubs/${id}/dashboard/blogs`, title: "Blogs" },
   ];
 
+  const handleDeleteBlog = async (blog: IBlog) => {
+    openConfirmModal({
+      title: "Delete blog",
+      centered: true,
+      children: (
+        <Text size="sm">
+          Are you sure you want to delete this blog ({blog.title} #{blog._id})?
+        </Text>
+      ),
+      labels: { confirm: "Delete Blog", cancel: "No don't delete" },
+      confirmProps: { color: "red" },
+      onConfirm: async () => {
+        try {
+          await axios.delete(`/api/clubs/${id}/blogs/${blog._id}`);
+        } catch (error) {
+          console.log(error);
+        }
+        await queryClient.refetchQueries(["club-blogs", id]);
+      },
+    });
+  };
+
   return (
     <ClubDashboardLayout>
       <Container size="xl">
@@ -77,6 +101,35 @@ const ClubBlogs = () => {
         </Stack>
 
         <ClubBlogsTable data={data?.blogs || []} />
+
+        <SimpleGrid
+          mt="1rem"
+          mb="3rem"
+          cols={4}
+          breakpoints={[
+            { maxWidth: "lg", cols: 3 },
+            { maxWidth: "md", cols: 2 },
+            { maxWidth: "sm", cols: 1 },
+          ]}
+        >
+          {data?.blogs.map((blog: IBlog) => (
+            <BlogCard
+              key={blog._id}
+              image={blog.featuredImage}
+              title={blog.title}
+              createdAt={new Date(blog.createdAt)}
+              href={`/blogs/${blog._id}`}
+              status={blog.status}
+              author={{
+                name: (blog.author.user as any).name,
+                image: (blog.author.user as any).profilePic,
+              }}
+              onDelete={() => handleDeleteBlog(blog)}
+              showActions={true}
+              editUrl={`/clubs/${id}/dashboard/blogs/${blog._id}/edit`}
+            />
+          ))}
+        </SimpleGrid>
       </Container>
     </ClubDashboardLayout>
   );
