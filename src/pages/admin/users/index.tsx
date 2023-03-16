@@ -1,20 +1,16 @@
 import {
   ActionIcon,
   Anchor,
-  Autocomplete,
   Avatar,
   Badge,
   Button,
   Container,
   Drawer,
   Group,
-  Loader,
-  LoadingOverlay,
   PasswordInput,
   ScrollArea,
   Select,
   Stack,
-  Switch,
   Table,
   Text,
   TextInput,
@@ -28,10 +24,9 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { CldUploadButton } from "next-cloudinary";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { AdminDashboardLayout } from "@/components/AdminDashboardLayout";
-import { useUser, useUserClubDetails } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
 import { IUser } from "@/models/user";
 import { queryClient } from "@/pages/_app";
@@ -89,10 +84,6 @@ interface DrawerProps {
   onClose: () => void;
 }
 const AddUserDrawer = (props: DrawerProps) => {
-  const router = useRouter();
-
-  const { id } = router.query;
-
   const form = useForm<AdminNewUserCredentialsDTO>({
     validateInputOnBlur: true,
     validate: zodResolver(adminNewUserSchema),
@@ -106,12 +97,7 @@ const AddUserDrawer = (props: DrawerProps) => {
   });
 
   const handleAddUser = async (data: AdminNewUserCredentialsDTO) => {
-    const response = (await axios.post("/api/users", data)) as {
-      message: string;
-      status: "OK" | "ERROR";
-      user: IUser;
-    };
-    await router.push(`/admin/users/${response.user._id}`);
+    await axios.post("/api/users", data);
     form.reset();
     props.onClose();
     await queryClient.refetchQueries(["all-users"]);
@@ -213,11 +199,6 @@ interface UsersTableProps {
 }
 
 export function UsersTable({ data }: UsersTableProps) {
-  const router = useRouter();
-
-  const { id } = router.query;
-
-  const { isUserInClub, isSuperUser } = useUserClubDetails();
   const [drawerOpened, { open: handleOpenDrawer, close: handleCloseDrawer }] =
     useDisclosure(false);
   const [selectedUser, setSelectedUser] = useState<IUser>();
@@ -255,14 +236,16 @@ export function UsersTable({ data }: UsersTableProps) {
             sx={{ objectFit: "cover" }}
           />
           <div>
-            <Anchor
-              component={Link}
-              href={`/admin/users/${item._id}`}
-              fz="sm"
-              fw={500}
-            >
+            {/*<Anchor*/}
+            {/*  component={Link}*/}
+            {/*  href={`/admin/users/${item._id}`}*/}
+            {/*  fz="sm"*/}
+            {/*  fw={500}*/}
+            {/*>*/}
+            <Text fz="sm" fw={500}>
               {item.name}
-            </Anchor>
+            </Text>
+            {/*</Anchor>*/}
             <Text fz="xs" c="dimmed">
               {item.email}
             </Text>
@@ -276,28 +259,24 @@ export function UsersTable({ data }: UsersTableProps) {
 
       <td>
         <Group>
-          {isSuperUser || isUserInClub?.role === "President" ? (
-            <ActionIcon
-              onClick={() => {
-                setSelectedUser(item);
-                handleOpenDrawer();
-              }}
-              variant="outline"
-              color="blue"
-            >
-              <IconEdit size={18} />
-            </ActionIcon>
-          ) : null}
+          <ActionIcon
+            onClick={() => {
+              setSelectedUser(item);
+              handleOpenDrawer();
+            }}
+            variant="outline"
+            color="blue"
+          >
+            <IconEdit size={18} />
+          </ActionIcon>
 
-          {isSuperUser || isUserInClub?.permissions.canRemoveMembers ? (
-            <ActionIcon
-              variant="outline"
-              color="red"
-              onClick={() => handleDeleteUser(item)}
-            >
-              <IconTrash size={18} />
-            </ActionIcon>
-          ) : null}
+          <ActionIcon
+            variant="outline"
+            color="red"
+            onClick={() => handleDeleteUser(item)}
+          >
+            <IconTrash size={18} />
+          </ActionIcon>
         </Group>
       </td>
     </tr>
@@ -316,38 +295,29 @@ export function UsersTable({ data }: UsersTableProps) {
         <tbody>{rows}</tbody>
       </Table>
 
-      <EditUserDrawer
-        opened={drawerOpened}
-        onClose={handleCloseDrawer}
-        user={selectedUser}
-      />
+      {selectedUser ? (
+        <EditUserDrawer
+          opened={drawerOpened}
+          onClose={handleCloseDrawer}
+          user={selectedUser}
+        />
+      ) : null}
     </ScrollArea>
   );
 }
 
-const EditUserDrawer = (props: DrawerProps & { user: IUser | undefined }) => {
+const EditUserDrawer = (props: DrawerProps & { user: IUser }) => {
   const form = useForm<AdminUpdateUserCredentialsDTO>({
     validateInputOnBlur: true,
     validate: zodResolver(adminUpdateUserSchema),
     initialValues: {
-      profilePic: "",
-      name: "",
-      email: "",
-      role: "",
+      profilePic: props.user.profilePic,
+      name: props.user.name,
+      email: props.user.email,
+      role: props.user.role,
       password: "",
     },
   });
-
-  useEffect(() => {
-    if (!props.user) return;
-
-    form.setValues(props.user);
-  }, [props.user]);
-
-  if (!props.user) {
-    props.onClose();
-    return null;
-  }
 
   const handleUpdateUser = async (data: AdminUpdateUserCredentialsDTO) => {
     await axios.patch(`/api/users/${props.user?._id}/`, data);

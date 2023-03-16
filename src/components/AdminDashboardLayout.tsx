@@ -41,6 +41,7 @@ export const AdminDashboardLayout = ({ children }: { children: ReactNode }) => {
             links={[{ href: "/", children: "Go to main website" }]}
             opened={opened}
             onToggle={toggleNavbar}
+            logo={<Logo />}
           />
         }
         className={classes.main}
@@ -57,6 +58,14 @@ interface MainLinkProps {
   label: string;
   href: string;
 }
+
+const Logo = () => {
+  return (
+    <Text fw={500} component={Link} href="/admin/users">
+      Admin Dashboard
+    </Text>
+  );
+};
 
 export const MainLink = ({ icon, color, label, href }: MainLinkProps) => {
   const router = useRouter();

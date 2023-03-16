@@ -211,7 +211,7 @@ export const Navbar = () => {
                   />
                 }
               />
-              {!isLoading && isError ? (
+              {!isLoading && !data ? (
                 <>
                   <Button
                     component={Link}
@@ -337,7 +337,9 @@ const UserMenu = () => {
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
-    await queryClient.refetchQueries(["current-user"]);
+    await queryClient.setQueryData(["current-user"], () => {
+      return null;
+    });
   };
 
   return (

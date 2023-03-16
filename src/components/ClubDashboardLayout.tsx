@@ -77,6 +77,7 @@ export const ClubDashboardLayout = ({ children }: { children: ReactNode }) => {
               { href: `/clubs/${id}`, children: "Club's Page" },
             ]}
             opened={opened}
+            logo={<Logo />}
             onToggle={toggleNavbar}
           />
         }
@@ -284,6 +285,7 @@ interface AppHeaderProps {
   opened: boolean;
   onToggle: () => void;
   links?: { children: string; href: string }[];
+  logo: React.ReactNode;
 }
 
 export const AppHeader = (props: AppHeaderProps) => {
@@ -302,7 +304,7 @@ export const AppHeader = (props: AppHeaderProps) => {
             mr="xl"
           />
         </MediaQuery>
-        <Logo />
+        {props.logo}
         <Group>
           <>
             {props.links?.map((link) => (

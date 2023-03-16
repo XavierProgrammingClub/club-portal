@@ -152,7 +152,6 @@ const ClubSettings = () => {
             {...form.getInputProps("shortDescription")}
             withAsterisk
             autosize
-            minRows={3}
             mb={"md"}
             error={form.errors.shortDescription}
           />

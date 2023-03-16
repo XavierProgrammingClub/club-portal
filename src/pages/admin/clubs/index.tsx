@@ -26,11 +26,10 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { CldUploadButton } from "next-cloudinary";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { AdminDashboardLayout } from "@/components/AdminDashboardLayout";
 import { useClubs } from "@/hooks/useClub";
-import { useUser, useUserClubDetails } from "@/hooks/useUser";
 import { axios } from "@/lib/axios";
 import { IClub } from "@/models/club";
 import { queryClient } from "@/pages/_app";
@@ -43,15 +42,10 @@ import {
 } from "@/validators";
 
 const Clubs = () => {
-  const { data, isLoading, isError } = useClubs();
+  const { data } = useClubs();
 
   const [drawerOpened, { open: handleOpenDrawer, close: handleCloseDrawer }] =
     useDisclosure(false);
-
-  const handleDeleteClubs = async (id: string) => {
-    await axios.delete(`/api/clubs/${id}`);
-    await queryClient.refetchQueries(["all-clubs"]);
-  };
 
   return (
     <AdminDashboardLayout>
@@ -125,7 +119,7 @@ export function ClubTable({ data }: ClubTableProps) {
           <div>
             <Anchor
               component={Link}
-              href={`/admin/clubs/${item._id}`}
+              href={`/clubs/${item._id}`}
               fz="sm"
               fw={500}
             >
@@ -181,11 +175,13 @@ export function ClubTable({ data }: ClubTableProps) {
         <tbody>{rows}</tbody>
       </Table>
 
-      <EditClubDrawer
-        opened={drawerOpened}
-        onClose={handleCloseDrawer}
-        club={selectedClub}
-      />
+      {selectedClub ? (
+        <EditClubDrawer
+          opened={drawerOpened}
+          onClose={handleCloseDrawer}
+          club={selectedClub}
+        />
+      ) : null}
     </ScrollArea>
   );
 }
@@ -295,28 +291,17 @@ const AddClubDrawer = (props: DrawerProps) => {
   );
 };
 
-const EditClubDrawer = (props: DrawerProps & { club: IClub | undefined }) => {
+const EditClubDrawer = (props: DrawerProps & { club: IClub }) => {
   const form = useForm<UpdateClubCredentialsDTO>({
     validateInputOnBlur: true,
     validate: zodResolver(updateClubSchema),
     initialValues: {
-      profilePic: "",
-      name: "",
-      shortDescription: "",
-      isAvailableForRegistration: true,
-    },
-  });
-
-  useEffect(() => {
-    if (!props.club) return;
-
-    form.setValues({
       profilePic: props.club.profilePic,
       name: props.club.name,
       shortDescription: props.club.shortDescription,
       isAvailableForRegistration: props.club.isAvailableForRegistration,
-    });
-  }, [props.club]);
+    },
+  });
 
   const handleUpdateClub = async (data: UpdateClubCredentialsDTO) => {
     await axios.patch(`/api/clubs/${props.club?._id}`, data);
@@ -390,7 +375,6 @@ const EditClubDrawer = (props: DrawerProps & { club: IClub | undefined }) => {
           mt="md"
           withAsterisk
           autosize
-          minRows={3}
           label="Short Description"
           error={form.errors.shortDescription}
           {...form.getInputProps("shortDescription")}
