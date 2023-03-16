@@ -7,7 +7,6 @@ import {
   UnstyledButton,
   Text,
   SimpleGrid,
-  ThemeIcon,
   Anchor,
   Divider,
   Center,
@@ -27,12 +26,6 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
-  IconNotification,
-  IconCode,
-  IconBook,
-  IconChartPie3,
-  IconFingerprint,
-  IconCoin,
   IconChevronDown,
   IconSun,
   IconMoonStars,

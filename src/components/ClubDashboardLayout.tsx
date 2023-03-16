@@ -16,6 +16,7 @@ import {
   Menu,
   ThemeIcon,
   LoadingOverlay,
+  Button,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import {
@@ -69,7 +70,16 @@ export const ClubDashboardLayout = ({ children }: { children: ReactNode }) => {
         padding="md"
         navbarOffsetBreakpoint="sm"
         navbar={<AppNavbar opened={opened} />}
-        header={<AppHeader opened={opened} onToggle={toggleNavbar} />}
+        header={
+          <AppHeader
+            links={[
+              { href: "/", children: "Home" },
+              { href: `/clubs/${id}`, children: "Club's Page" },
+            ]}
+            opened={opened}
+            onToggle={toggleNavbar}
+          />
+        }
         className={classes.main}
       >
         {children}
@@ -273,6 +283,7 @@ export const AppNavbar = (props: AppNavbarProps) => {
 interface AppHeaderProps {
   opened: boolean;
   onToggle: () => void;
+  links?: { children: string; href: string }[];
 }
 
 export const AppHeader = (props: AppHeaderProps) => {
@@ -292,17 +303,29 @@ export const AppHeader = (props: AppHeaderProps) => {
           />
         </MediaQuery>
         <Logo />
-        <ActionIcon
-          variant="default"
-          onClick={() => toggleColorScheme()}
-          size={30}
-        >
-          {colorScheme === "dark" ? (
-            <IconSun size={16} />
-          ) : (
-            <IconMoonStars size={16} />
-          )}
-        </ActionIcon>
+        <Group>
+          <>
+            {props.links?.map((link) => (
+              <Button
+                variant={"subtle"}
+                component={Link}
+                {...link}
+                key={link.href}
+              />
+            ))}
+            <ActionIcon
+              variant="default"
+              onClick={() => toggleColorScheme()}
+              size={30}
+            >
+              {colorScheme === "dark" ? (
+                <IconSun size={16} />
+              ) : (
+                <IconMoonStars size={16} />
+              )}
+            </ActionIcon>
+          </>
+        </Group>
       </Group>
     </Header>
   );

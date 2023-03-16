@@ -2,7 +2,6 @@ import {
   Avatar,
   Button,
   Container,
-  LoadingOverlay,
   Switch,
   Text,
   Textarea,
@@ -16,11 +15,11 @@ import SubScript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
-import { useEditor } from "@tiptap/react";
+import { Editor, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useRouter } from "next/router";
 import { CldUploadButton } from "next-cloudinary";
-import React, { useEffect, useRef } from "react";
+import React from "react";
 
 import { ClubDashboardLayout } from "@/components/ClubDashboardLayout";
 import { DashboardBreadCrumb } from "@/components/DashboardBreadCrumb";
@@ -30,9 +29,6 @@ import { queryClient } from "@/pages/_app";
 import { CloudinaryImage } from "@/types/cloudinary";
 import { updateClubSchema, UpdateClubCredentialsDTO } from "@/validators";
 
-const content =
-  '<h2 style="text-align: center;">Welcome to Mantine rich text editor</h2><p><code>RichTextEditor</code> component focuses on usability and is designed to be as simple as possible to bring a familiar editing experience to regular users. <code>RichTextEditor</code> is based on <a href="https://tiptap.dev/" rel="noopener noreferrer" target="_blank">Tiptap.dev</a> and supports all of its features:</p><ul><li>General text formatting: <strong>bold</strong>, <em>italic</em>, <u>underline</u>, <s>strike-through</s> </li><li>Headings (h1-h6)</li><li>Sub and super scripts (<sup>&lt;sup /&gt;</sup> and <sub>&lt;sub /&gt;</sub> tags)</li><li>Ordered and bullet lists</li><li>Text align&nbsp;</li><li>And all <a href="https://tiptap.dev/extensions" target="_blank" rel="noopener noreferrer">other extensions</a></li></ul>';
-
 const ClubSettings = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -41,6 +37,25 @@ const ClubSettings = () => {
     id: id as string,
     onSuccess: (data) => {
       form.setValues(data.club);
+      editor?.commands.setContent(data.club.description);
+    },
+  });
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Link,
+      Superscript,
+      SubScript,
+      Highlight,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+    ],
+    onUpdate: ({ editor }) => {
+      form.setFieldValue("description", editor.getHTML());
+    },
+    onCreate: ({ editor }) => {
+      editor.commands.setContent(data?.club.description || "");
     },
   });
 
@@ -144,9 +159,7 @@ const ClubSettings = () => {
 
           <DescriptionEditor
             content={form.values.description || ""}
-            onChange={(value: string) =>
-              form.setFieldValue("description", value)
-            }
+            editor={editor}
           />
           {form.errors.description ? (
             <Text fz="xs" color={"red"}>
@@ -170,37 +183,9 @@ const ClubSettings = () => {
   );
 };
 
-function DescriptionEditor(props: {
-  content: string;
-  onChange: (value: string) => void;
-}) {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      Link,
-      Superscript,
-      SubScript,
-      Highlight,
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
-    ],
-    content: props.content,
-  });
-
-  const contentChangedRef = useRef(false);
-
-  useEffect(() => {
-    if (contentChangedRef.current || !props.content) return;
-
-    editor?.commands.setContent(props.content);
-  }, [props.content]);
-
-  editor?.on("update", (a) => {
-    props.onChange(a.editor.getHTML());
-  });
-
+function DescriptionEditor(props: { content: string; editor: null | Editor }) {
   return (
-    <RichTextEditor editor={editor}>
+    <RichTextEditor editor={props.editor}>
       <RichTextEditor.Toolbar sticky stickyOffset={60}>
         <RichTextEditor.ControlsGroup>
           <RichTextEditor.Bold />

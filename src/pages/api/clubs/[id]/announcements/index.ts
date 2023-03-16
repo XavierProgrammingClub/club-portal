@@ -30,13 +30,17 @@ export default async function handler(
     }
 
     if (req.method === "GET") {
-      const club = await Club.find({
-        _id: id,
-        members: {
+      const findFilter: any = {};
+      if (user.role !== "superuser")
+        findFilter.members = {
           $elemMatch: {
             user: user._id,
           },
-        },
+        };
+
+      const club = await Club.find({
+        _id: id,
+        ...findFilter,
       }).populate("announcements.author.user");
 
       if (club.length === 0)
@@ -80,13 +84,13 @@ export default async function handler(
       if (!mongoose.Types.ObjectId.isValid(data.author.user))
         return res
           .status(400)
-          .json({ status: "ERROR", message: "Invalid Member!" });
+          .json({ status: "ERROR", message: "You are not part of this club!" });
 
       const userExists = await User.exists({ _id: data.author.user });
       if (!userExists)
         return res
           .status(400)
-          .json({ status: "ERROR", message: "Invalid Member!" });
+          .json({ status: "ERROR", message: "You are not part of this club!" });
 
       await Club.updateOne(
         { _id: id },

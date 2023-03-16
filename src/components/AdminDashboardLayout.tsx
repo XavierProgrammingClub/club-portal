@@ -36,7 +36,13 @@ export const AdminDashboardLayout = ({ children }: { children: ReactNode }) => {
         padding="md"
         navbarOffsetBreakpoint="sm"
         navbar={<AppNavbar opened={opened} />}
-        header={<AppHeader opened={opened} onToggle={toggleNavbar} />}
+        header={
+          <AppHeader
+            links={[{ href: "/", children: "Go to main website" }]}
+            opened={opened}
+            onToggle={toggleNavbar}
+          />
+        }
         className={classes.main}
       >
         {children}
