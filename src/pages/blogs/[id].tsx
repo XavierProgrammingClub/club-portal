@@ -22,7 +22,9 @@ import TimeAgo from "react-timeago";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import Blog, { IBlog } from "@/models/blog";
+import Club from "@/models/club";
 import { useStyles } from "@/pages";
+import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
 
 const SingleBlogsPage = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>
@@ -146,10 +148,37 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const blog = (await Blog.findById(id as string)
     .populate("author.user", "profilePic name")
     .populate("author.club", "profilePic name")) as IBlog;
+
   if (!blog)
     return {
       notFound: true,
     };
+
+  if (blog.status === "draft") {
+    let user;
+
+    try {
+      user = await getCurrentUserDetails(context);
+    } catch (err) {
+      //   Empty
+    }
+
+    if (!user) return { notFound: true };
+
+    const club = await Club.find({
+      _id: (blog.author.club as any)._id,
+      members: {
+        $elemMatch: {
+          user: (user._id as any).toHexString(),
+        },
+      },
+    });
+
+    if (club.length === 0)
+      return {
+        notFound: true,
+      };
+  }
 
   return {
     props: { blog: JSON.parse(JSON.stringify(blog)) },
