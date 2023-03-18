@@ -18,6 +18,7 @@ import Blog, { IBlog } from "@/models/blog";
 import Club from "@/models/club";
 import { useStyles } from "@/pages";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
+import { connectDatabase } from "@/utils/db";
 import { timeAgo } from "@/utils/timeAgo";
 
 const SingleBlogsPage = (
@@ -144,6 +145,8 @@ export const BlogInfo = (props: BlogInfoProps) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  await connectDatabase();
+
   const { id } = context.query;
 
   const blog = (await Blog.findById(id as string)
