@@ -11,6 +11,7 @@ import {
   ScrollArea,
   Table,
   SimpleGrid,
+  LoadingOverlay,
 } from "@mantine/core";
 import { openConfirmModal } from "@mantine/modals";
 import { IconEdit, IconSearch, IconTrash } from "@tabler/icons-react";
@@ -133,6 +134,7 @@ const ClubBlogs = () => {
               editUrl={`/clubs/${id}/dashboard/blogs/${blog._id}/edit`}
             />
           ))}
+          {!data ? <LoadingOverlay visible={true} overlayBlur={2} /> : null}
         </SimpleGrid>
       </Container>
     </ClubDashboardLayout>

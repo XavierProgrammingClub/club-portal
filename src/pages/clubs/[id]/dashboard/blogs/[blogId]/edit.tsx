@@ -5,6 +5,7 @@ import {
   Button,
   Select,
   Text,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { Link as RichTextEditorLink } from "@mantine/tiptap";
@@ -91,6 +92,8 @@ const EditBlog = () => {
     },
     validate: zodResolver(blogSchema),
   });
+
+  if (!data) return <LoadingOverlay visible={true} overlayBlur={2} />;
 
   const breadcrumbItems = [
     {

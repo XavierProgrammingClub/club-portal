@@ -19,6 +19,7 @@ import {
   Textarea,
   ActionIcon,
   Menu,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -129,6 +130,10 @@ const ClubDashboard = () => {
           opened={newAnnouncementDrawerOpened}
           onClose={handleNewAnnouncementDrawerClose}
         />
+
+        {!announcementsData ? (
+          <LoadingOverlay visible={true} overlayBlur={2} />
+        ) : null}
       </ClubDashboardLayout>
     </>
   );
