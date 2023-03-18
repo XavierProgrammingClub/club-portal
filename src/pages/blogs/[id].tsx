@@ -155,6 +155,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       notFound: true,
     };
 
+  return {
+    props: { blog: JSON.parse(JSON.stringify(blog)) },
+  };
+
   if (blog.status === "draft") {
     let user;
 
