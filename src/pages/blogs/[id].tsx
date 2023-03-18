@@ -1,23 +1,16 @@
 import {
   Avatar,
   Badge,
-  Button,
-  Card,
   Col,
   Container,
-  Flex,
   Grid,
-  Group,
   Paper,
-  SimpleGrid,
   Text,
-  Title,
   TypographyStylesProvider,
   useMantineTheme,
 } from "@mantine/core";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import React from "react";
-import TimeAgo from "react-timeago";
+import React, { useEffect, useState } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
@@ -25,12 +18,12 @@ import Blog, { IBlog } from "@/models/blog";
 import Club from "@/models/club";
 import { useStyles } from "@/pages";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
+import { timeAgo } from "@/utils/timeAgo";
 
 const SingleBlogsPage = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) => {
   const theme = useMantineTheme();
-  const { classes } = useStyles();
 
   return (
     <>
@@ -99,48 +92,56 @@ interface BlogInfoProps {
   createdAt: Date;
 }
 
-export const BlogInfo = (props: BlogInfoProps) => (
-  <Paper
-    radius="md"
-    withBorder
-    p="lg"
-    sx={(theme) => ({
-      backgroundColor:
-        theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white,
-    })}
-  >
-    <Avatar
-      src={`https://res.cloudinary.com/dmixkq1uo/image/upload/w_200/${props.club.avatar}`}
-      size={120}
-      radius={120}
-      sx={{ objectFit: "cover" }}
-      mx="auto"
-    />
+export const BlogInfo = (props: BlogInfoProps) => {
+  const [hydrated, setHydrated] = useState(false);
 
-    <div style={{ display: "flex", justifyContent: "center" }}>
-      <Badge mt="lg">
-        Posted <TimeAgo date={props.createdAt} />
-      </Badge>
-    </div>
-    <Text ta="center" fz="lg" weight={500} component="h1">
-      {props.club.name}
-    </Text>
-    <Text ta="center" c="dimmed" fz="sm">
-      {/*{description}*/}
-    </Text>
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
-    {/*{isSuperUser || isUserInClub ? (*/}
-    {/*  <Button*/}
-    {/*    fullWidth*/}
-    {/*    mt="md"*/}
-    {/*    component={Link}*/}
-    {/*    href={`/clubs/${_id}/dashboard`}*/}
-    {/*  >*/}
-    {/*    View Dashboard*/}
-    {/*  </Button>*/}
-    {/*) : null}*/}
-  </Paper>
-);
+  return (
+    <Paper
+      radius="md"
+      withBorder
+      p="lg"
+      sx={(theme) => ({
+        backgroundColor:
+          theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white,
+      })}
+    >
+      <Avatar
+        src={`https://res.cloudinary.com/dmixkq1uo/image/upload/w_200/${props.club.avatar}`}
+        size={120}
+        radius={120}
+        sx={{ objectFit: "cover" }}
+        mx="auto"
+      />
+
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <Badge mt="lg">
+          {hydrated ? `Posted ${timeAgo(props.createdAt)}` : null}
+        </Badge>
+      </div>
+      <Text ta="center" fz="lg" weight={500} component="h1">
+        {props.club.name}
+      </Text>
+      <Text ta="center" c="dimmed" fz="sm">
+        {/*{description}*/}
+      </Text>
+
+      {/*{isSuperUser || isUserInClub ? (*/}
+      {/*  <Button*/}
+      {/*    fullWidth*/}
+      {/*    mt="md"*/}
+      {/*    component={Link}*/}
+      {/*    href={`/clubs/${_id}/dashboard`}*/}
+      {/*  >*/}
+      {/*    View Dashboard*/}
+      {/*  </Button>*/}
+      {/*) : null}*/}
+    </Paper>
+  );
+};
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query;

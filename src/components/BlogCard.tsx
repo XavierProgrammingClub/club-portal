@@ -13,8 +13,10 @@ import {
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TimeAgo from "react-timeago";
+
+import { timeAgo } from "@/utils/timeAgo";
 
 const useStyles = createStyles((theme) => ({
   card: {
@@ -62,6 +64,11 @@ export const BlogCard = ({
   showActions,
 }: BlogCardProps) => {
   const { classes, theme } = useStyles();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  });
 
   return (
     <Card withBorder padding="lg" radius="md" className={classes.card}>
@@ -105,7 +112,7 @@ export const BlogCard = ({
           <Text fw={500}>{author.name}</Text>
 
           <Text fz="xs" c="dimmed" size="xs">
-            Posted <TimeAgo live={false} date={createdAt} />
+            {hydrated ? `Posted ${timeAgo(createdAt)}` : null}
           </Text>
         </div>
       </Flex>

@@ -1,16 +1,17 @@
 import { Container, SimpleGrid, Text, useMantineTheme } from "@mantine/core";
-import { GetStaticProps, InferGetStaticPropsType } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import React from "react";
 
 import { BlogCard } from "@/components/BlogCard";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import Blog, { IBlog } from "@/models/blog";
-import Club, { IClub } from "@/models/club";
 import { WhatAreYouThinkingSection } from "@/pages";
 import { connectDatabase } from "@/utils/db";
 
-const Index = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
+const Index = (
+  props: InferGetServerSidePropsType<typeof getServerSideProps>
+) => {
   const theme = useMantineTheme();
   return (
     <>
@@ -69,7 +70,7 @@ const Index = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
 
 export default Index;
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   await connectDatabase();
 
   const blogs = (await Blog.find({ status: "public" }).populate(
@@ -81,6 +82,5 @@ export const getStaticProps: GetStaticProps = async (context) => {
     props: {
       blogs: JSON.parse(JSON.stringify(blogs)),
     },
-    revalidate: 100,
   };
 };
