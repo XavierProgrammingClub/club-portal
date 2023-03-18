@@ -23,6 +23,7 @@ import { timeAgo } from "@/utils/timeAgo";
 const SingleBlogsPage = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) => {
+  return "FUCK ALL";
   const theme = useMantineTheme();
 
   return (
