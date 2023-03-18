@@ -147,8 +147,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query;
 
   const blog = (await Blog.findById(id as string)
-    .populate("author.user", "profilePic name")
-    .populate("author.club", "profilePic name")) as IBlog;
+    // .populate("author.user", "profilePic name")
+    // .populate("author.club", "profilePic name")) as IBlog;
 
   if (!blog)
     return {
