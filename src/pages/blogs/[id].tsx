@@ -146,10 +146,6 @@ export const BlogInfo = (props: BlogInfoProps) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query;
 
-  return {
-    props: { blog: "fuck all" },
-  };
-
   const blog = (await Blog.findById(id as string)
     .populate("author.user", "profilePic name")
     .populate("author.club", "profilePic name")) as IBlog;
@@ -158,10 +154,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
       notFound: true,
     };
-
-  return {
-    props: { blog: JSON.parse(JSON.stringify(blog)) },
-  };
 
   if (blog.status === "draft") {
     let user;
