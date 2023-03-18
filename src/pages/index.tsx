@@ -782,6 +782,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   await connectDatabase();
 
   const clubs = (await Club.find()) as IClub[];
+
   const blogs = (await Blog.find({ status: "public" })
     .limit(8)
     .populate("author.club", "name profilePic")) as IBlog[];

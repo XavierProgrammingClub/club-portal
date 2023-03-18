@@ -46,31 +46,31 @@ const SingleBlogsPage = (
         </Container>
       </div>
 
-      {/*<Container size="xl">*/}
-      {/*  <Grid>*/}
-      {/*    <Col md={9} sm={12}>*/}
-      {/*      <div style={{ maxWidth: "50rem" }}>*/}
-      {/*        <TypographyStylesProvider>*/}
-      {/*          <div dangerouslySetInnerHTML={{ __html: props.blog.content }} />*/}
-      {/*        </TypographyStylesProvider>*/}
-      {/*      </div>*/}
-      {/*    </Col>*/}
+      <Container size="xl">
+        <Grid>
+          <Col md={9} sm={12}>
+            <div style={{ maxWidth: "50rem" }}>
+              <TypographyStylesProvider>
+                <div dangerouslySetInnerHTML={{ __html: props.blog.content }} />
+              </TypographyStylesProvider>
+            </div>
+          </Col>
 
-      {/*    <Col md={3} sm={12}>*/}
-      {/*      <BlogInfo*/}
-      {/*        createdAt={new Date(props.blog.createdAt)}*/}
-      {/*        club={{*/}
-      {/*          name: props.blog.author.club.name,*/}
-      {/*          avatar: props.blog.author.club.profilePic,*/}
-      {/*        }}*/}
-      {/*        user={{*/}
-      {/*          name: props.blog.author.user.name,*/}
-      {/*          avatar: props.blog.author.user.profilePic,*/}
-      {/*        }}*/}
-      {/*      />*/}
-      {/*    </Col>*/}
-      {/*  </Grid>*/}
-      {/*</Container>*/}
+          <Col md={3} sm={12}>
+            <BlogInfo
+              createdAt={new Date(props.blog.createdAt)}
+              club={{
+                name: props.blog.author.club.name,
+                avatar: props.blog.author.club.profilePic,
+              }}
+              user={{
+                name: props.blog.author.user.name,
+                avatar: props.blog.author.user.profilePic,
+              }}
+            />
+          </Col>
+        </Grid>
+      </Container>
 
       <Footer />
     </>
@@ -146,9 +146,9 @@ export const BlogInfo = (props: BlogInfoProps) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query;
 
-  const blog = await Blog.findById(id as string);
-  // .populate("author.user", "profilePic name")
-  // .populate("author.club", "profilePic name")) as IBlog;
+  const blog = (await Blog.findById(id as string)
+    .populate("author.user", "profilePic name")
+    .populate("author.club", "profilePic name")) as IBlog;
 
   if (!blog)
     return {
