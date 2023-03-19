@@ -500,6 +500,9 @@ export const ClubsSection = (props: { clubs: IClub[] }) => {
           { maxWidth: "sm", cols: 2 },
           { maxWidth: "xs", cols: 1 },
         ]}
+        sx={{
+          alignItems: "center",
+        }}
       >
         {props.clubs.map((club) => (
           <ClubCard
@@ -639,6 +642,9 @@ export const BlogsSection = (props: { blogs: IBlog[] }) => {
           { maxWidth: "sm", cols: 2 },
           { maxWidth: "xs", cols: 1 },
         ]}
+        sx={{
+          alignItems: "center",
+        }}
       >
         {props.blogs.map((blog) => (
           <BlogCard
