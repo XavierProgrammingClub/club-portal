@@ -9,6 +9,7 @@ import {
 import { useForm, zodResolver } from "@mantine/form";
 import { Link } from "@mantine/tiptap";
 import Highlight from "@tiptap/extension-highlight";
+import Image from "@tiptap/extension-image";
 import SubScript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import TextAlign from "@tiptap/extension-text-align";
@@ -44,6 +45,11 @@ const NewBlog = () => {
       Superscript,
       SubScript,
       Highlight,
+      Image.configure({
+        HTMLAttributes: {
+          style: "width:100%;",
+        },
+      }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     onUpdate: ({ editor }) => {

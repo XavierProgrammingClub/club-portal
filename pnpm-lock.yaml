@@ -16,6 +16,7 @@ specifiers:
   '@tabler/icons-react': ^2.10.0
   '@tanstack/react-query': ^4.26.1
   '@tiptap/extension-highlight': 2.0.0-beta.220
+  '@tiptap/extension-image': 2.0.0-beta.220
   '@tiptap/extension-link': 2.0.0-beta.220
   '@tiptap/extension-subscript': 2.0.0-beta.220
   '@tiptap/extension-superscript': 2.0.0-beta.220
@@ -79,6 +80,7 @@ dependencies:
   '@tabler/icons-react': 2.10.0_react@18.2.0
   '@tanstack/react-query': 4.26.1_biqbaboplfbrettd7655fr4n2y
   '@tiptap/extension-highlight': 2.0.0-beta.220
+  '@tiptap/extension-image': 2.0.0-beta.220
   '@tiptap/extension-link': 2.0.0-beta.220_@tiptap+pm@2.0.0-beta.220
   '@tiptap/extension-subscript': 2.0.0-beta.220
   '@tiptap/extension-superscript': 2.0.0-beta.220
@@ -2016,6 +2018,12 @@ packages:
     dependencies:
       '@tiptap/core': 2.0.0-beta.220_@tiptap+pm@2.0.0-beta.220
       '@tiptap/pm': 2.0.0-beta.220
+    dev: false
+
+  /@tiptap/extension-image/2.0.0-beta.220:
+    resolution: {integrity: sha512-xyzlY/cupj/7AVqybQDaPaJ3SwKqe12xMWQlWxhhksuNpbQ6RGHrJz0DBSe61kIkaTZmIUBw055IFEMOPFF53g==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0-beta.209
     dev: false
 
   /@tiptap/extension-italic/2.0.0-beta.220_7w7m52asdh3tod4ocz57yex63q:

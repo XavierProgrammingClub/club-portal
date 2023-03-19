@@ -9,8 +9,14 @@ import {
   Title,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
-import { RichTextEditor, Link } from "@mantine/tiptap";
+import {
+  RichTextEditor,
+  Link,
+  useRichTextEditorContext,
+} from "@mantine/tiptap";
+import { IconPhoto } from "@tabler/icons-react";
 import Highlight from "@tiptap/extension-highlight";
+import Image from "@tiptap/extension-image";
 import SubScript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import TextAlign from "@tiptap/extension-text-align";
@@ -49,6 +55,11 @@ const ClubSettings = () => {
       Superscript,
       SubScript,
       Highlight,
+      Image.configure({
+        HTMLAttributes: {
+          style: "width:100%;",
+        },
+      }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     onUpdate: ({ editor }) => {
@@ -186,50 +197,96 @@ export function DescriptionEditor(props: {
   content: string;
   editor: null | Editor;
 }) {
+  const handleEditorUploadImage = (a: CloudinaryImage) => {
+    if (!(a.event === "success")) return;
+
+    console.log(a.info.width, a.info.height);
+
+    props.editor?.commands.setImage({
+      src: `https://res.cloudinary.com/dmixkq1uo/image/upload/h_${a.info.height}/${a.info.public_id}`,
+    });
+  };
+
   return (
-    <RichTextEditor editor={props.editor}>
-      <RichTextEditor.Toolbar sticky stickyOffset={60}>
-        <RichTextEditor.ControlsGroup>
-          <RichTextEditor.Bold />
-          <RichTextEditor.Italic />
-          <RichTextEditor.Underline />
-          <RichTextEditor.Strikethrough />
-          <RichTextEditor.ClearFormatting />
-          <RichTextEditor.Highlight />
-          <RichTextEditor.Code />
-        </RichTextEditor.ControlsGroup>
+    <>
+      <CldUploadButton
+        options={{
+          multiple: false,
+          resourceType: "image",
+          maxFileSize: 5242880,
+        }}
+        onUpload={handleEditorUploadImage}
+        uploadPreset="fs1xhftk"
+        {...{
+          id: "editorUploadBtn",
+          style: {
+            visibility: "hidden",
+            border: 0,
+            padding: 0,
+            width: 0,
+          },
+        }}
+      />
 
-        <RichTextEditor.ControlsGroup>
-          <RichTextEditor.H1 />
-          <RichTextEditor.H2 />
-          <RichTextEditor.H3 />
-          <RichTextEditor.H4 />
-        </RichTextEditor.ControlsGroup>
+      <RichTextEditor editor={props.editor}>
+        <RichTextEditor.Toolbar sticky stickyOffset={60}>
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.Bold />
+            <RichTextEditor.Italic />
+            <RichTextEditor.Underline />
+            <RichTextEditor.Strikethrough />
+            <RichTextEditor.ClearFormatting />
+            <RichTextEditor.Highlight />
+            <RichTextEditor.Code />
+          </RichTextEditor.ControlsGroup>
 
-        <RichTextEditor.ControlsGroup>
-          <RichTextEditor.Blockquote />
-          <RichTextEditor.Hr />
-          <RichTextEditor.BulletList />
-          <RichTextEditor.OrderedList />
-          <RichTextEditor.Subscript />
-          <RichTextEditor.Superscript />
-        </RichTextEditor.ControlsGroup>
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.H1 />
+            <RichTextEditor.H2 />
+            <RichTextEditor.H3 />
+            <RichTextEditor.H4 />
+          </RichTextEditor.ControlsGroup>
 
-        <RichTextEditor.ControlsGroup>
-          <RichTextEditor.Link />
-          <RichTextEditor.Unlink />
-        </RichTextEditor.ControlsGroup>
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.Blockquote />
+            <RichTextEditor.Hr />
+            <RichTextEditor.BulletList />
+            <RichTextEditor.OrderedList />
+            <RichTextEditor.Subscript />
+            <RichTextEditor.Superscript />
+          </RichTextEditor.ControlsGroup>
 
-        <RichTextEditor.ControlsGroup>
-          <RichTextEditor.AlignLeft />
-          <RichTextEditor.AlignCenter />
-          <RichTextEditor.AlignJustify />
-          <RichTextEditor.AlignRight />
-        </RichTextEditor.ControlsGroup>
-      </RichTextEditor.Toolbar>
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.Link />
+            <RichTextEditor.Unlink />
+            <InsertImageControl />
+          </RichTextEditor.ControlsGroup>
 
-      <RichTextEditor.Content />
-    </RichTextEditor>
+          <RichTextEditor.ControlsGroup>
+            <RichTextEditor.AlignLeft />
+            <RichTextEditor.AlignCenter />
+            <RichTextEditor.AlignJustify />
+            <RichTextEditor.AlignRight />
+          </RichTextEditor.ControlsGroup>
+        </RichTextEditor.Toolbar>
+
+        <RichTextEditor.Content />
+      </RichTextEditor>
+    </>
+  );
+}
+
+function InsertImageControl() {
+  const { editor } = useRichTextEditorContext();
+
+  return (
+    <RichTextEditor.Control
+      onClick={() => document.getElementById("editorUploadBtn")?.click()}
+      aria-label="Insert an image"
+      title="Insert an image"
+    >
+      <IconPhoto stroke={1.5} size="1rem" />
+    </RichTextEditor.Control>
   );
 }
 
