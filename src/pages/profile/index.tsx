@@ -29,7 +29,7 @@ const Index = () => {
   if (isUserLoading || isClubLoading)
     return <LoadingOverlay visible={true} overlayBlur={2} />;
   if (!userData || !clubsData) {
-    router.push("/");
+    router.push("/").catch(console.log);
     return;
   }
 

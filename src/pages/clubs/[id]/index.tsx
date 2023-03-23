@@ -7,9 +7,7 @@ import {
   Container,
   Flex,
   Grid,
-  Group,
   Paper,
-  SimpleGrid,
   Text,
   Title,
   TypographyStylesProvider,
@@ -22,10 +20,10 @@ import React from "react";
 
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { connectDatabase } from "@/lib/db";
 import Club, { IClub, IMember } from "@/models/club";
 import { useStyles } from "@/pages";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
-import { connectDatabase } from "@/lib/db";
 
 const SingleClubPage = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>

@@ -5,7 +5,6 @@ import {
   Container,
   Group,
   rem,
-  Anchor,
   Button,
 } from "@mantine/core";
 import Link from "next/link";

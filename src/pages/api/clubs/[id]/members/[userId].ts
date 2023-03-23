@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { connectDatabase } from "@/lib/db";
 import Club from "@/models/club";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
-import { connectDatabase } from "@/lib/db";
-import { updateAnnouncementSchema, updateMemberSchema } from "@/validators";
+import { updateMemberSchema } from "@/validators";
 
 export default async function handler(
   req: NextApiRequest,

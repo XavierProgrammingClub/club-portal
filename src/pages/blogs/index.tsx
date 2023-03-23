@@ -5,9 +5,9 @@ import React from "react";
 import { BlogCard } from "@/components/BlogCard";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { connectDatabase } from "@/lib/db";
 import Blog, { IBlog } from "@/models/blog";
 import { WhatAreYouThinkingSection } from "@/pages";
-import { connectDatabase } from "@/lib/db";
 
 const Index = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>

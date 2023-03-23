@@ -14,11 +14,10 @@ import React, { useEffect, useState } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { connectDatabase } from "@/lib/db";
 import Blog, { IBlog } from "@/models/blog";
 import Club from "@/models/club";
-import { useStyles } from "@/pages";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
-import { connectDatabase } from "@/lib/db";
 import { timeAgo } from "@/utils/timeAgo";
 
 const SingleBlogsPage = (

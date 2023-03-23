@@ -3,8 +3,8 @@ import { GetServerSidePropsContext } from "next";
 import NextAuth, { getServerSession, NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-import User, { IUser } from "@/models/user";
 import { connectDatabase } from "@/lib/db";
+import User, { IUser } from "@/models/user";
 import { env } from "@/utils/env";
 import { loginUserSchema } from "@/validators";
 

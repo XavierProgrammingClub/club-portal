@@ -6,32 +6,25 @@ import {
   Text,
   Card,
   SimpleGrid,
-  Image,
   Container,
   Title,
   createStyles,
   rem,
-  ActionIcon,
 } from "@mantine/core";
-import {
-  IconGauge,
-  IconUser,
-  IconCookie,
-  IconHeart,
-} from "@tabler/icons-react";
+import { IconGauge, IconUser, IconCookie } from "@tabler/icons-react";
 import { GetStaticProps, InferGetStaticPropsType } from "next";
 import { Inter } from "next/font/google";
 import Head from "next/head";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
-import React from "react";
+import React, { ComponentPropsWithoutRef } from "react";
 
 import { BlogCard } from "@/components/BlogCard";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { connectDatabase } from "@/lib/db";
 import Blog, { IBlog } from "@/models/blog";
 import Club, { IClub } from "@/models/club";
-import { connectDatabase } from "@/lib/db";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -664,7 +657,7 @@ export const BlogsSection = (props: { blogs: IBlog[] }) => {
   );
 };
 
-interface DotsProps extends React.ComponentPropsWithoutRef<"svg"> {
+interface DotsProps extends ComponentPropsWithoutRef<"svg"> {
   size?: number;
   radius?: number;
 }
@@ -784,7 +777,7 @@ function Dots({ size = 185, radius = 2.5, ...others }: DotsProps) {
   );
 }
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getStaticProps: GetStaticProps = async () => {
   await connectDatabase();
 
   const clubs = (await Club.find()) as IClub[];

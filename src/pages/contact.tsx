@@ -66,7 +66,7 @@ const ContactForm = () => {
 
   return (
     <Container size="sm" mt="3rem" mb="3rem">
-      <form onSubmit={form.onSubmit(() => {})}>
+      <form>
         <Title
           order={2}
           size="h1"

@@ -1,10 +1,10 @@
 import { genSalt, hash } from "bcryptjs";
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { connectDatabase } from "@/lib/db";
 import User from "@/models/user";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
-import { connectDatabase } from "@/lib/db";
-import { adminNewUserSchema, adminUpdateUserSchema } from "@/validators";
+import { adminUpdateUserSchema } from "@/validators";
 
 export default async function handler(
   req: NextApiRequest,
