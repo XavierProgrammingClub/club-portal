@@ -31,7 +31,7 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import Blog, { IBlog } from "@/models/blog";
 import Club, { IClub } from "@/models/club";
-import { connectDatabase } from "@/utils/db";
+import { connectDatabase } from "@/lib/db";
 
 const inter = Inter({ subsets: ["latin"] });
 

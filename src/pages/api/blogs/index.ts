@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import Blog from "@/models/blog";
-import { connectDatabase } from "@/utils/db";
+import { connectDatabase } from "@/lib/db";
 
 export default async function handler(
   req: NextApiRequest,

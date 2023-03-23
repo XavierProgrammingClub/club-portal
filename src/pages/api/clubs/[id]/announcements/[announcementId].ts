@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import Club from "@/models/club";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
-import { connectDatabase } from "@/utils/db";
+import { connectDatabase } from "@/lib/db";
 import { updateAnnouncementSchema } from "@/validators";
 
 export default async function handler(

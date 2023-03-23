@@ -16,7 +16,6 @@ import NextApp from "next/app";
 import { Inter } from "next/font/google";
 import { useRouter } from "next/router";
 import { SessionProvider } from "next-auth/react";
-import "react-toastify/dist/ReactToastify.css";
 import { useEffect, useState } from "react";
 
 export const queryClient = new QueryClient({

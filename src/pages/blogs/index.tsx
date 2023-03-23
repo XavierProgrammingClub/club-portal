@@ -7,7 +7,7 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import Blog, { IBlog } from "@/models/blog";
 import { WhatAreYouThinkingSection } from "@/pages";
-import { connectDatabase } from "@/utils/db";
+import { connectDatabase } from "@/lib/db";
 
 const Index = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>

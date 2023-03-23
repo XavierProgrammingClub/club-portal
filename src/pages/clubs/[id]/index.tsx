@@ -25,7 +25,7 @@ import { Navbar } from "@/components/Navbar";
 import Club, { IClub, IMember } from "@/models/club";
 import { useStyles } from "@/pages";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
-import { connectDatabase } from "@/utils/db";
+import { connectDatabase } from "@/lib/db";
 
 const SingleClubPage = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>

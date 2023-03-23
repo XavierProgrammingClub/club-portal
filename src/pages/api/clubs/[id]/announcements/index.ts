@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import Club, { IAnnouncement, IClub } from "@/models/club";
 import User from "@/models/user";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
-import { connectDatabase } from "@/utils/db";
+import { connectDatabase } from "@/lib/db";
 import { newAnnouncementSchema } from "@/validators";
 
 export default async function handler(

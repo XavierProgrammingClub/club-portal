@@ -18,7 +18,7 @@ import Blog, { IBlog } from "@/models/blog";
 import Club from "@/models/club";
 import { useStyles } from "@/pages";
 import { getCurrentUserDetails } from "@/pages/api/auth/[...nextauth]";
-import { connectDatabase } from "@/utils/db";
+import { connectDatabase } from "@/lib/db";
 import { timeAgo } from "@/utils/timeAgo";
 
 const SingleBlogsPage = (
@@ -68,6 +68,7 @@ const SingleBlogsPage = (
                 name: props.blog.author.user.name,
                 avatar: props.blog.author.user.profilePic,
               }}
+              status={props.blog.status}
             />
           </Col>
         </Grid>
@@ -91,6 +92,7 @@ interface BlogInfoProps {
     name: string;
   };
   createdAt: Date;
+  status: string;
 }
 
 export const BlogInfo = (props: BlogInfoProps) => {
@@ -119,27 +121,19 @@ export const BlogInfo = (props: BlogInfoProps) => {
       />
 
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Badge mt="lg">
-          {hydrated ? `Posted ${timeAgo(props.createdAt)}` : null}
-        </Badge>
+        {props.status === "draft" ? (
+          <Badge mt="lg" color="red">
+            Draft
+          </Badge>
+        ) : (
+          <Badge mt="lg">
+            {hydrated ? `Posted ${timeAgo(props.createdAt)}` : null}
+          </Badge>
+        )}
       </div>
       <Text ta="center" fz="lg" weight={500} component="h1">
         {props.club.name}
       </Text>
-      <Text ta="center" c="dimmed" fz="sm">
-        {/*{description}*/}
-      </Text>
-
-      {/*{isSuperUser || isUserInClub ? (*/}
-      {/*  <Button*/}
-      {/*    fullWidth*/}
-      {/*    mt="md"*/}
-      {/*    component={Link}*/}
-      {/*    href={`/clubs/${_id}/dashboard`}*/}
-      {/*  >*/}
-      {/*    View Dashboard*/}
-      {/*  </Button>*/}
-      {/*) : null}*/}
     </Paper>
   );
 };

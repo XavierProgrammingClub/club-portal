@@ -4,7 +4,7 @@ import NextAuth, { getServerSession, NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import User, { IUser } from "@/models/user";
-import { connectDatabase } from "@/utils/db";
+import { connectDatabase } from "@/lib/db";
 import { env } from "@/utils/env";
 import { loginUserSchema } from "@/validators";
 
