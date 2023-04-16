@@ -68,7 +68,7 @@ export const BlogCard = ({
 
   useEffect(() => {
     setHydrated(true);
-  });
+  }, []);
 
   return (
     <Card withBorder padding="lg" radius="md" className={classes.card}>
